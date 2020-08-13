@@ -20,9 +20,11 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.BaseFragment
-import com.andromite.birthdayreminder.adapter.HomeAdapter
+import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.activities.ViewBirthday
+import com.andromite.birthdayreminder.adapter.FSHomeAdapter
+import com.andromite.birthdayreminder.adapter.HomeAdapter
 import com.andromite.birthdayreminder.db.Birthday
 import com.andromite.birthdayreminder.db.BirthdayDatabase
 import com.bumptech.glide.Glide
@@ -37,24 +39,22 @@ import kotlinx.android.synthetic.main.fragment_home.view.*
 import kotlinx.coroutines.launch
 import java.io.InputStream
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
     lateinit var home: HomeFragment
-    var imp : Boolean = false
-    var event : Int = 1
-     var profileuri : Uri? = null
-     lateinit var birthdayList : List<Birthday>
+    var imp: Boolean = false
+    var event: Int = 1
+    var profileuri: Uri? = null
+    lateinit var birthdayList: List<Birthday>
+    var FSbirthdayList: ArrayList<FSBirthday> = ArrayList()
+    var DocList: ArrayList<String> = ArrayList()
 
     private val GALLERY_REQUEST_CODE = 1234
 
     val TAG = "12345"
-
-
-
-
-
 
 
     @SuppressLint("SetTextI18n")
@@ -74,7 +74,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         // add date validation function
 
         // add select birthday or anniversary   done
-            // change colors if possible
+        // change colors if possible
         // add others option
         // add connect with contacts
 
@@ -107,7 +107,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         // is important
         view.imp_title.setOnClickListener {
 
-            if (!imp){
+            if (!imp) {
                 imp = true
                 view.imp_title.setBackgroundResource(R.drawable.color_primary_bg)
                 view.star.setImageResource(R.drawable.ic_gold_star)
@@ -126,52 +126,70 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         view.tv3.setOnClickListener {
 
             val c = Calendar.getInstance()
-            val year = c.get(Calendar.YEAR)
+            val calYear = c.get(Calendar.YEAR)
             val month = c.get(Calendar.MONTH)
             val day = c.get(Calendar.DAY_OF_MONTH)
 
 
-
-                val dpd = DatePickerDialog(requireContext(),R.style.MyDatePickerDialogTheme, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            val dpd = DatePickerDialog(
+                requireContext(),
+                R.style.MyDatePickerDialogTheme,
+                DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                     // Display Selected date in TextView
                     date.text = "$dayOfMonth/${monthOfYear + 1}/$year"
-                }, year, month, day)
-                dpd.show()
+                },
+                calYear,
+                month,
+                day
+            )
+            dpd.show()
 
             select_birthday_error.visibility = View.GONE
 
 
-
         }
-
-
-
-
 
         view.recyclerview.hasFixedSize()
-        view.recyclerview.layoutManager = LinearLayoutManager(context,RecyclerView.VERTICAL, false)
+        view.recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        launch {
-            context?.let {
-                birthdayList = BirthdayDatabase(it).getBirthdayDao().getAllBirthday()
-                view.recyclerview.adapter =
-                    HomeAdapter(
-                        birthdayList,
-                        this@HomeFragment
-                    )
+        //get list of birthdays from firestore
+        db.collection("Birthdays").orderBy("peron_name").get()
+            .addOnSuccessListener {
+
+
+
+                for (doc in it.documents) {
+
+                    Log.e("12345", doc.data.toString())
+                    val dataList: MutableMap<String, Any>? = doc.data
+//                    if (dataList != null) {
+                        val birthday = FSBirthday(
+                            doc.id,
+                            dataList?.getValue("peron_name").toString(),
+                            dataList?.getValue("date").toString(),
+                            dataList?.getValue("event").toString(),
+                            dataList?.getValue("isImportant").toString(),
+                            dataList?.getValue("notes").toString(),
+                            dataList?.getValue("profilePic").toString()
+                        )
+                        FSbirthdayList.add(birthday)
+//                    }
+                }
+                view.recyclerview.adapter = FSHomeAdapter(FSbirthdayList, this@HomeFragment)
+
             }
-        }
 
 
+//
+//        launch {
+//            context?.let {
+//                birthdayList = BirthdayDatabase(it).getBirthdayDao().getAllBirthday()
+//                view.recyclerview.adapter = HomeAdapter(birthdayList,this@HomeFragment)
+//            }
+//        }
 
 
-
-
-
-
-        //buttons
-
-
+        // FAB add Birthday Button
         view.floating_action_button.setOnClickListener {
 
             val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
@@ -188,6 +206,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
         }
 
+        //close and open transition FAB
         view.btn_close.setOnClickListener {
 
             val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
@@ -243,69 +262,72 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
         }
 
+        //firestore add birthday
         view.btn_submit.setOnClickListener {
-
-            // Create a new user with a first and last name
-            val user = hashMapOf(
-                "first" to "Ada",
-                "last" to "Lovelace",
-                "born" to 1815
-            )
-
-// Add a new document with a generated ID
-            db.collection("users")
-                .add(user)
-                .addOnSuccessListener { documentReference ->
-                    Log.e(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                }
-                .addOnFailureListener { e ->
-                    Log.e(TAG, "Error adding document", e)
-                }
-
 
 
             home = HomeFragment()
 
-            val person_name = person_name.text.toString().trim()
+            val personName = person_name.text.toString().trim()
             val date = date.text.toString().trim()
             val isImportant = imp
             val notes = notes.text.toString().trim()
             val profilePic = getProfilePic()
 
             //checking if the attributes are empty
-            if(person_name.isEmpty()){
+            if (personName.isEmpty()) {
                 tv1.error = getString(R.string.name_error_string)
-            } else if(date.isEmpty()) {
-                select_birthday_error.visibility =View.VISIBLE
+            } else if (date.isEmpty()) {
+                select_birthday_error.visibility = View.VISIBLE
             }
 
-
-            if (!person_name.isEmpty() && !date.isEmpty()){
+            if (personName.isNotEmpty() && date.isNotEmpty()) {
                 launch {
-                    val birthday = Birthday(person_name,date,event,isImportant,notes,profilePic)
-                    context?.let {
-                        BirthdayDatabase(activity!!).getBirthdayDao().addBirthday(birthday)
-                        Toast.makeText(activity,"Birthday Added",Toast.LENGTH_SHORT).show()
-                    }
+                    val birthday = Birthday(personName, date, event, isImportant, notes, profilePic)
+//                    context?.let {
+//                        BirthdayDatabase(activity!!).getBirthdayDao().addBirthday(birthday)
+
+
+                        // Create a new birthday in db
+                        val birthdayMap = hashMapOf(
+                            "peron_name" to personName,
+                            "date" to date,
+                            "event" to event,
+                            "isImportant" to isImportant,
+                            "notes" to notes,
+                            "profilePic" to profilePic
+                        )
+
+                        // Add a new document with a generated ID
+                        db.collection("Birthdays")
+                            .add(birthdayMap)
+                            .addOnSuccessListener { documentReference ->
+                                Log.e(
+                                    TAG,
+                                    "DocumentSnapshot added with ID: ${documentReference.id}"
+                                )
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Error adding document", e)
+                            }
+
+                        Toast.makeText(activity, "Birthday Added", Toast.LENGTH_SHORT).show()
+//                    }
                 }
 
                 fragmentManager!!.beginTransaction()
-                    .replace(R.id.frame_layout,home)
+                    .replace(R.id.frame_layout, home)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commit()
             }
 
-
         }
 
         view.additional_info.setOnClickListener {
-
             view.additional_info.visibility = View.GONE
-
             view.tv2.visibility = View.VISIBLE
             view.select_pic.visibility = View.VISIBLE
             view.imp_title.visibility = View.VISIBLE
-
         }
 
         view.select_pic.setOnClickListener {
@@ -314,7 +336,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
         }
 
-    return view
+        return view
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -327,9 +349,8 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
                     data?.data?.let { uri ->
                         launchImageCrop(uri)
                     }
-                }
-                else{
-                    Log.e("12345", "Image selection error: Couldn't select that image from memory." )
+                } else {
+                    Log.e("12345", "Image selection error: Couldn't select that image from memory.")
                 }
             }
 
@@ -337,10 +358,10 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == Activity.RESULT_OK) {
                     profileuri = result.uri
+                    Log.e(TAG, profileuri.toString())
                     setImage(result.uri)
-                }
-                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    Log.e("12345", "Crop error: ${result.getError()}" )
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Log.e("12345", "Crop error: ${result.error}")
                 }
             }
         }
@@ -348,28 +369,28 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
     }
 
 
-    private fun setImage(uri: Uri){
+    private fun setImage(uri: Uri) {
         Glide.with(this)
             .load(uri)
             .into(profileImage)
     }
 
-    fun getProfilePic() : ByteArray?
-    {
-        if (profileuri != null){
-            val iStream: InputStream? = requireActivity().getContentResolver().openInputStream(profileuri!!)
+    private fun getProfilePic(): ByteArray? {
+        if (profileuri != null) {
+            val iStream: InputStream? =
+                requireActivity().contentResolver.openInputStream(profileuri!!)
             val inputData = iStream!!.readBytes()
-            return  inputData
+            return inputData
         }
         return null
     }
 
-    private fun launchImageCrop(uri: Uri){
+    private fun launchImageCrop(uri: Uri) {
         CropImage.activity(uri)
             .setGuidelines(CropImageView.Guidelines.OFF)
             .setFixAspectRatio(true)
             .setCropShape(CropImageView.CropShape.OVAL) // default is rectangle
-            .start(requireContext(),this)
+            .start(requireContext(), this)
     }
 
     private fun pickFromGallery() {
@@ -385,28 +406,17 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
     override fun onImageClick(imageData: Int) {
         Log.e("12345 in fragment", imageData.toString())
 
-//        val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
-//            startView = cardView
-//            endView = view?.viewBirthday
-//            pathMotion = MaterialArcMotion()
-//            scrimColor = Color.TRANSPARENT
-//            duration = 500
-//        }
-//
-//        TransitionManager.beginDelayedTransition(view?.cl_main, transform)
-//        view!!.floating_action_button.visibility = View.GONE
-//        view!!.viewBirthday.visibility = View.VISIBLE
-
-        var selected_birthday = birthdayList.get(imageData)
 
 
-        val intent = Intent (requireContext(), ViewBirthday::class.java)
-        intent.putExtra("birthday", selected_birthday)
+//        var selected_birthday = FSbirthdayList.get(imageData)
+//        var list : ArrayList<FSBirthday> = ArrayList()
+//        list.add(selected_birthday)
+
+        val intent = Intent(requireContext(), ViewBirthday::class.java)
+        intent.putExtra("selected_birthday", FSbirthdayList[imageData])
         startActivity(intent)
 
     }
-
-
 
 
 }

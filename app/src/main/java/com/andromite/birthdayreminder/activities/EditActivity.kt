@@ -10,12 +10,14 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.Toast
+import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.db.Birthday
 import com.andromite.birthdayreminder.db.BirthdayDatabase
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.activity_edit.*
@@ -33,8 +35,6 @@ import kotlinx.android.synthetic.main.activity_edit.person_name
 import kotlinx.android.synthetic.main.activity_edit.profileImage
 import kotlinx.android.synthetic.main.activity_edit.star
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.fragment_home.view.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.InputStream
@@ -46,17 +46,19 @@ class EditActivity : AppCompatActivity() {
     var imp : Boolean = false
     private val GALLERY_REQUEST_CODE = 1234
     var profileuri : Uri? = null
-    var id : Int = 0
+    lateinit var id : String
+    lateinit var db : FirebaseFirestore
+    lateinit var  selected_birthday : FSBirthday
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
+         db = Firebase.firestore
 
+        selected_birthday  = intent.extras?.get("birthday") as FSBirthday
 
-        var selected_birthday  = intent.extras?.get("birthday") as Birthday
-
-        id = selected_birthday.id
+//        id = selected_birthday.id
 
         setDefaultData(selected_birthday)
 
@@ -64,7 +66,8 @@ class EditActivity : AppCompatActivity() {
         clickEvents()
 
         btn_submitt.setOnClickListener {
-            savetoDB()
+//            savetoDB()
+            updateFirestore()
         }
 
 
@@ -72,6 +75,34 @@ class EditActivity : AppCompatActivity() {
 
 
 
+    }
+
+    fun updateFirestore() {
+
+        val person_name = person_name.text.toString().trim()
+        val date = date.text.toString().trim()
+        val isImportant = imp
+        val notes = notes.text.toString().trim()
+        val profilePic = getProfilePic()
+
+        //checking if the attributes are empty
+        if (person_name.isEmpty()) {
+            tvv1.error = getString(R.string.name_error_string)
+        } else if (date.isEmpty()) {
+            select_birthday_error.visibility = View.VISIBLE
+        }
+
+
+        if (!person_name.isEmpty() && !date.isEmpty()) {
+
+            val data = hashMapOf("peron_name" to person_name,"date" to date, "isImportant" to isImportant, "notes" to notes)
+
+            db.collection("Birthdays").document(selected_birthday.id)
+                .set(data, SetOptions.merge())
+
+            startActivity(Intent(this, MainActivity::class.java))
+
+        }
     }
 
     private fun savetoDB() {
@@ -92,13 +123,13 @@ class EditActivity : AppCompatActivity() {
 
         if (!person_name.isEmpty() && !date.isEmpty()) {
 
-            GlobalScope.launch {
+//            GlobalScope.launch {
 //                val birthday = Birthday(person_name, date, event, isImportant, notes, profilePic)
-                applicationContext.let {
-                    BirthdayDatabase(this@EditActivity).getBirthdayDao().updateBirthday(person_name,date,event,isImportant,notes,profilePic,id)
+//                applicationContext.let {
+//                    BirthdayDatabase(this@EditActivity).getBirthdayDao().updateBirthday(person_name,date,event,isImportant,notes,profilePic,id)
 //                    Toast.makeText(this@EditActivity, "Birthday Updated", Toast.LENGTH_SHORT).show()
-                }
-            }
+//                }
+//            }
 
 //            launch {
 //                val birthday = Birthday(person_name, date, event, isImportant, notes, profilePic)
@@ -192,12 +223,12 @@ class EditActivity : AppCompatActivity() {
 
     }
 
-    fun setDefaultData(selectedBirthday: Birthday) {
+    fun setDefaultData(selectedBirthday: FSBirthday) {
 
         person_name.setText(selectedBirthday.person_name)
         date.setText(selectedBirthday.date)
 
-        if (selectedBirthday.event == 1){
+        if (selectedBirthday.event.equals("1")){
             event = 1  // 1 for birthday
             icn_birthday.setBackgroundResource(R.drawable.color_primary_bg)
             icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_white)
@@ -219,13 +250,13 @@ class EditActivity : AppCompatActivity() {
             icn_bir_tv.setTextColor(Color.parseColor("#000000"))
         }
 
-        if (selectedBirthday.isImportant){
-            imp = false
+        if (selectedBirthday.isImportant.equals("true")){
+            imp = true
             imp_title.setBackgroundResource(R.drawable.color_primary_bg)
             star.setImageResource(R.drawable.ic_gold_star)
             isImp_tv.setTextColor(Color.parseColor("#FFFFFF"))
         }else {
-            imp = true
+            imp = false
             imp_title.setBackgroundResource(R.drawable.grey_bg)
             star.setImageResource(R.drawable.ic_black_star)
             isImp_tv.setTextColor(Color.parseColor("#000000"))
