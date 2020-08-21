@@ -12,6 +12,8 @@ import android.util.Log
 import android.view.View
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
+import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.db.BirthdayDatabase
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,10 +51,14 @@ class EditActivity : AppCompatActivity() {
     lateinit var id : String
     lateinit var db : FirebaseFirestore
     lateinit var  selected_birthday : FSBirthday
+    lateinit var uid : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
+
+        uid = SharedPrefrenceUtils().getSP(this,"googleuid")
+        Utils().LogPrint(uid)
 
          db = Firebase.firestore
 
@@ -97,7 +103,7 @@ class EditActivity : AppCompatActivity() {
 
             val data = hashMapOf("peron_name" to person_name,"date" to date, "isImportant" to isImportant, "notes" to notes)
 
-            db.collection("Birthdays").document(selected_birthday.id)
+            db.collection("users/" + uid + "/Birthdays").document(selected_birthday.id)
                 .set(data, SetOptions.merge())
 
             startActivity(Intent(this, MainActivity::class.java))

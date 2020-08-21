@@ -1,6 +1,6 @@
 package com.andromite.birthdayreminder.adapter
 
-//import kotlinx.android.synthetic.main.fragment_home.view.tv1
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

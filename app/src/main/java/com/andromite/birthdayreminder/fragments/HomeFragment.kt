@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.BaseFragment
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
+import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.activities.ViewBirthday
 import com.andromite.birthdayreminder.adapter.FSHomeAdapter
 import com.andromite.birthdayreminder.adapter.HomeAdapter
@@ -32,6 +34,7 @@ import com.google.android.material.transition.MaterialArcMotion
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -51,10 +54,12 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
     lateinit var birthdayList: List<Birthday>
     var FSbirthdayList: ArrayList<FSBirthday> = ArrayList()
     var DocList: ArrayList<String> = ArrayList()
+    var docid : String = ""
 
     private val GALLERY_REQUEST_CODE = 1234
 
     val TAG = "12345"
+    var profilePicAdded: Boolean = false
 
 
     @SuppressLint("SetTextI18n")
@@ -68,6 +73,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         val db = Firebase.firestore
+        val storage = Firebase.storage
 
         // add date selector    done
 
@@ -77,6 +83,10 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         // change colors if possible
         // add others option
         // add connect with contacts
+
+        // get UID from sharedprefrences
+        var uid = SharedPrefrenceUtils().getSP(context,"googleuid")
+        Utils().LogPrint("googleuid" + uid)
 
 
         //event = birthday or anniversary
@@ -153,15 +163,15 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         view.recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         //get list of birthdays from firestore
-        db.collection("Birthdays").orderBy("peron_name").get()
+        db.collection("users/" + uid + "/Birthdays").orderBy("peron_name").get()
             .addOnSuccessListener {
 
 
 
                 for (doc in it.documents) {
 
-                    Log.e("12345", doc.data.toString())
-                    val dataList: MutableMap<String, Any>? = doc.data
+                    Utils().LogPrint("List of Birthdays" + doc.data.toString())
+                    val dataList  : MutableMap<String, Any>? = doc.data
 //                    if (dataList != null) {
                         val birthday = FSBirthday(
                             doc.id,
@@ -287,38 +297,56 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 //                    context?.let {
 //                        BirthdayDatabase(activity!!).getBirthdayDao().addBirthday(birthday)
 
+                    if (profilePicAdded) {
+                        Utils().LogPrint("inside if" )
 
-                        // Create a new birthday in db
-                        val birthdayMap = hashMapOf(
-                            "peron_name" to personName,
-                            "date" to date,
-                            "event" to event,
-                            "isImportant" to isImportant,
-                            "notes" to notes,
-                            "profilePic" to profilePic
-                        )
+                        var ref = storage.reference.child("profilePic/" + uid + "/" +  profileuri!!.lastPathSegment + ".jpg")
+                        ref.putFile(profileuri!!).addOnSuccessListener {
 
-                        // Add a new document with a generated ID
-                        db.collection("Birthdays")
-                            .add(birthdayMap)
-                            .addOnSuccessListener { documentReference ->
-                                Log.e(
-                                    TAG,
-                                    "DocumentSnapshot added with ID: ${documentReference.id}"
+                            Utils().LogPrint("photo uploaded successfully" )
+
+                            ref.downloadUrl.addOnCompleteListener {
+
+                                Utils().LogPrint("Storage downloadedUrl : ${it.getResult()}" )
+
+                                var p = it.result.toString()
+
+                                // Create a new birthday in db
+                                val birthdayMap = hashMapOf(
+                                    "peron_name" to personName,
+                                    "date" to date,
+                                    "event" to event,
+                                    "isImportant" to isImportant,
+                                    "notes" to notes,
+                                    "profilePic" to it.result.toString()
                                 )
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e(TAG, "Error adding document", e)
-                            }
 
-                        Toast.makeText(activity, "Birthday Added", Toast.LENGTH_SHORT).show()
-//                    }
+                                // Add a new document with a generated ID
+                                db.collection("users/" + uid + "/Birthdays")
+                                    .add(birthdayMap)
+                                    .addOnSuccessListener { documentReference ->
+
+                                        Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
+
+                                        fragmentManager!!.beginTransaction()
+                                            .replace(R.id.frame_layout, home)
+                                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                            .commit()
+                                        Toast.makeText(activity, "Birthday Added", Toast.LENGTH_SHORT).show()
+
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Utils().LogPrint( "Error adding document" + e)
+                                    }
+                            }
+                        }
+                    }
                 }
 
-                fragmentManager!!.beginTransaction()
-                    .replace(R.id.frame_layout, home)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit()
+//                fragmentManager!!.beginTransaction()
+//                    .replace(R.id.frame_layout, home)
+//                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                    .commit()
             }
 
         }
@@ -358,6 +386,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == Activity.RESULT_OK) {
                     profileuri = result.uri
+                    profilePicAdded = true
                     Log.e(TAG, profileuri.toString())
                     setImage(result.uri)
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {

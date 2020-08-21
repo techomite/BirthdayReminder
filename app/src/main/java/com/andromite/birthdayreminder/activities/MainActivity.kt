@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
+import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.fragments.CalenderFragment
 import com.andromite.birthdayreminder.fragments.HomeFragment
 import com.andromite.birthdayreminder.fragments.ImportantFragment
@@ -19,6 +21,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        var uid = SharedPrefrenceUtils().getSP(this,"googleuid")
+        Utils().LogPrint(uid)
 
         home = HomeFragment()
         supportFragmentManager.beginTransaction()
