@@ -316,7 +316,7 @@ class EditActivity : AppCompatActivity() {
 
                     }
                     .addOnFailureListener { e ->
-                        Utils().LogPrint("Error adding document" + e)
+                        Utils().LogPrint("Error adding document -->" + e)
                     }
 
             }
