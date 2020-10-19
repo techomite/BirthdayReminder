@@ -7,20 +7,19 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.FragmentTransaction
+import androidx.appcompat.app.AppCompatActivity
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.Constants.Companion.GALLERY_REQUEST_CODE
 import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
 import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.broadcast.ReminderBroadcast
 import com.andromite.birthdayreminder.db.Birthday
-import com.andromite.birthdayreminder.db.BirthdayDatabase
 import com.andromite.birthdayreminder.fragments.HomeFragment
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
@@ -55,25 +54,24 @@ import java.util.*
 
 class EditActivity : AppCompatActivity() {
 
-    var event : Int = 1
-    var imp : Boolean = false
-    private val GALLERY_REQUEST_CODE = 1234
-    var profileuri : Uri? = null
-    lateinit var id : String
-    lateinit var db : FirebaseFirestore
-    lateinit var  selected_birthday : FSBirthday
-    lateinit var uid : String
+    var event: Int = 1
+    var imp: Boolean = false
+    var profileuri: Uri? = null
+    lateinit var id: String
+    lateinit var db: FirebaseFirestore
+    lateinit var selected_birthday: FSBirthday
+    lateinit var uid: String
     val storage = Firebase.storage
-    var profilePicAdded : Boolean = false
+    var profilePicAdded: Boolean = false
     lateinit var home: HomeFragment
-    lateinit var current_date : Calendar
-    lateinit var selected_date : Calendar
+    lateinit var current_date: Calendar
+    lateinit var selected_date: Calendar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
-        uid = SharedPrefrenceUtils().getSP(this,"googleuid")
+        uid = SharedPrefrenceUtils().getSP(this, "googleuid")
         Utils().LogPrint(uid)
         db = Firebase.firestore
 
@@ -82,7 +80,7 @@ class EditActivity : AppCompatActivity() {
 
         } else {        // view_birthday
 
-            selected_birthday  = intent.extras?.get("birthday") as FSBirthday
+            selected_birthday = intent.extras?.get("birthday") as FSBirthday
 //        id = selected_birthday.id
             setDefaultData(selected_birthday)
 
@@ -93,36 +91,38 @@ class EditActivity : AppCompatActivity() {
 
 
         btn_submitt.setOnClickListener {
-//            savetoDB()        // old Room DB code
-            if (intent.hasExtra("add_birthday")){
-                addBirthdayFirestore()
+//            saveToDB()        // old Room DB code
+            if (intent.hasExtra("add_birthday")) {
+                addBirthdayFireStore()
                 setReminder()
             } else if (intent.hasExtra("edit_birthday")) {
-                updateFirestore()
+                updateFireStore()
             }
         }
     }
 
-     fun setReminder() {
+    private fun setReminder() {
 
-        var intent = Intent(this,ReminderBroadcast::class.java)
-         intent.putExtra("name",person_name.text.toString().trim())
-        var pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
+        val intent = Intent(this, ReminderBroadcast::class.java)
+        intent.putExtra("name", person_name.text.toString().trim())
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
 
-        var manager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val manager = getSystemService(ALARM_SERVICE) as AlarmManager
 
 //        var time = System.currentTimeMillis()
 //        var birthday_time = 1000 * 10;
 
-         manager.set(AlarmManager.RTC_WAKEUP,
+        manager.set(
+            AlarmManager.RTC_WAKEUP,
 //         time + longtime,
-         selected_date.timeInMillis,
-         pendingIntent)
+            selected_date.timeInMillis,
+            pendingIntent
+        )
 
 
     }
 
-    fun addBirthdayFirestore() {
+    private fun addBirthdayFireStore() {
         home = HomeFragment()
 
         val personName = person_name.text.toString().trim()
@@ -146,16 +146,17 @@ class EditActivity : AppCompatActivity() {
 //                        BirthdayDatabase(activity!!).getBirthdayDao().addBirthday(birthday)
 
                 if (profilePicAdded) {
-                    Utils().LogPrint("inside if" )
+                    Utils().LogPrint("inside if")
 
-                    var ref = storage.reference.child("profilePic/" + uid + "/" +  profileuri!!.lastPathSegment + ".jpg")
+                    var ref =
+                        storage.reference.child("profilePic/" + uid + "/" + profileuri!!.lastPathSegment + ".jpg")
                     ref.putFile(profileuri!!).addOnSuccessListener {
 
-                        Utils().LogPrint("photo uploaded successfully" )
+                        Utils().LogPrint("photo uploaded successfully")
 
                         ref.downloadUrl.addOnCompleteListener {
 
-                            Utils().LogPrint("Storage downloadedUrl : ${it.getResult()}" )
+                            Utils().LogPrint("Storage downloadedUrl : ${it.getResult()}")
 
                             var p = it.result.toString()
 
@@ -174,13 +175,22 @@ class EditActivity : AppCompatActivity() {
                                 .add(birthdayMap)
                                 .addOnSuccessListener { documentReference ->
 
-                                    Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
+                                    Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}")
 
-                                    Toast.makeText(applicationContext, "Birthday Added", Toast.LENGTH_SHORT).show()
-                                    startActivity(Intent(applicationContext,MainActivity::class.java))
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Birthday Added",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    startActivity(
+                                        Intent(
+                                            applicationContext,
+                                            MainActivity::class.java
+                                        )
+                                    )
                                 }
                                 .addOnFailureListener { e ->
-                                    Utils().LogPrint( "Error adding document" + e)
+                                    Utils().LogPrint("Error adding document" + e)
                                 }
                         }
                     }
@@ -201,14 +211,15 @@ class EditActivity : AppCompatActivity() {
                         .add(birthdayMap)
                         .addOnSuccessListener { documentReference ->
 
-                            Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
+                            Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}")
 
-                            Toast.makeText(applicationContext, "Birthday Added", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(applicationContext,MainActivity::class.java))
+                            Toast.makeText(applicationContext, "Birthday Added", Toast.LENGTH_SHORT)
+                                .show()
+                            startActivity(Intent(applicationContext, MainActivity::class.java))
 
                         }
                         .addOnFailureListener { e ->
-                            Utils().LogPrint( "Error adding document" + e)
+                            Utils().LogPrint("Error adding document" + e)
                         }
 
                 }
@@ -216,44 +227,44 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
-    fun updateFirestore() {
+    private fun updateFireStore() {
 
-        val person_name = person_name.text.toString().trim()
+        val personName = person_name.text.toString().trim()
         val date = date.text.toString().trim()
         val isImportant = imp
         val notes = notes.text.toString().trim()
         val profilePic = getProfilePic()
 
         //checking if the attributes are empty
-        if (person_name.isEmpty()) {
+        if (personName.isEmpty()) {
             tvv1.error = getString(R.string.name_error_string)
         } else if (date.isEmpty()) {
             select_birthday_error.visibility = View.VISIBLE
         }
 
-
-        if (!person_name.isEmpty() && !date.isEmpty()) {
+        if (personName.isNotEmpty() && date.isNotEmpty()) {
 
             if (profilePicAdded) {
-                Utils().LogPrint("inside if" )
+                Utils().LogPrint("inside if")
 
                 if (!selected_birthday.equals("")) {
 
-                    var delref = storage.getReferenceFromUrl(selected_birthday.profilePic)
-                        delref.delete().addOnSuccessListener {
-                            Utils().LogPrint("photo deleted")
+                    val delref = storage.getReferenceFromUrl(selected_birthday.profilePic)
+                    delref.delete().addOnSuccessListener {
+                        Utils().LogPrint("photo deleted")
 
-                        var ref = storage.reference.child("profilePic/" + uid + "/" +  profileuri!!.lastPathSegment + ".jpg")
+                        val ref =
+                            storage.reference.child("profilePic/" + uid + "/" + profileuri!!.lastPathSegment + ".jpg")
                         ref.putFile(profileuri!!).addOnSuccessListener {
 
-                            Utils().LogPrint("photo uploaded successfully" )
+                            Utils().LogPrint("photo uploaded successfully")
 
                             ref.downloadUrl.addOnCompleteListener {
-                                Utils().LogPrint("Storage downloadedUrl : ${it.result}" )
+                                Utils().LogPrint("Storage downloadedUrl : ${it.result}")
 
                                 // Create a new birthday in db
                                 val birthdayMap = hashMapOf(
-                                    "peron_name" to person_name,
+                                    "peron_name" to personName,
                                     "date" to date,
                                     "event" to event,
                                     "isImportant" to isImportant,
@@ -262,7 +273,8 @@ class EditActivity : AppCompatActivity() {
                                 )
 
                                 // Add a new document with a generated ID
-                                db.collection("users/" + uid + "/Birthdays").document(selected_birthday.id)
+                                db.collection("users/" + uid + "/Birthdays")
+                                    .document(selected_birthday.id)
                                     .set(birthdayMap, SetOptions.merge())
                                     .addOnSuccessListener { documentReference ->
 
@@ -272,7 +284,7 @@ class EditActivity : AppCompatActivity() {
 
                                     }
                                     .addOnFailureListener { e ->
-                                        Utils().LogPrint( "Error adding document" + e)
+                                        Utils().LogPrint("Error adding document -->" + e)
                                     }
                             }
                         }
@@ -285,7 +297,7 @@ class EditActivity : AppCompatActivity() {
 
                 // Create a new birthday in db
                 val birthdayMap = hashMapOf(
-                    "peron_name" to person_name,
+                    "peron_name" to personName,
                     "date" to date,
                     "event" to event,
                     "isImportant" to isImportant,
@@ -304,7 +316,7 @@ class EditActivity : AppCompatActivity() {
 
                     }
                     .addOnFailureListener { e ->
-                        Utils().LogPrint( "Error adding document" + e)
+                        Utils().LogPrint("Error adding document -->" + e)
                     }
 
             }
@@ -317,23 +329,23 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
-    private fun savetoDB() {
+    private fun saveToDB() {
 
-        val person_name = person_name.text.toString().trim()
+        val personName = person_name.text.toString().trim()
         val date = date.text.toString().trim()
         val isImportant = imp
         val notes = notes.text.toString().trim()
         val profilePic = getProfilePic()
 
         //checking if the attributes are empty
-        if (person_name.isEmpty()) {
+        if (personName.isEmpty()) {
             tvv1.error = getString(R.string.name_error_string)
         } else if (date.isEmpty()) {
             select_birthday_error.visibility = View.VISIBLE
         }
 
 
-        if (!person_name.isEmpty() && !date.isEmpty()) {
+        if (personName.isNotEmpty() && date.isNotEmpty()) {
 
 //            GlobalScope.launch {
 //                val birthday = Birthday(person_name, date, event, isImportant, notes, profilePic)
@@ -357,7 +369,7 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
-    fun clickEvents(){
+    private fun clickEvents() {
 
         // event
         icn_birthday.setOnClickListener {
@@ -387,13 +399,12 @@ class EditActivity : AppCompatActivity() {
         //important
         imp_title.setOnClickListener {
 
-            if (!imp){
+            if (!imp) {
                 imp = true
                 imp_title.setBackgroundResource(R.drawable.color_primary_bg)
                 star.setImageResource(R.drawable.ic_gold_star)
                 isImp_tv.setTextColor(Color.parseColor("#FFFFFF"))
-            } else
-            {
+            } else {
                 imp = false
                 imp_title.setBackgroundResource(R.drawable.grey_bg)
                 star.setImageResource(R.drawable.ic_black_star)
@@ -411,19 +422,26 @@ class EditActivity : AppCompatActivity() {
 
             current_date = c
 
-            val dpd = DatePickerDialog(this,R.style.MyDatePickerDialogTheme, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-                // Display Selected date in TextView
-                date.text = "$dayOfMonth/${monthOfYear + 1}/$year"
-                selected_date = Calendar.getInstance()
-                selected_date.set(Calendar.YEAR,year)
-                selected_date.set(Calendar.MONTH,monthOfYear)
-                selected_date.set(Calendar.DAY_OF_MONTH,dayOfMonth)
-                selected_date.set(Calendar.HOUR_OF_DAY,0)
-                selected_date.set(Calendar.MINUTE,0)
-                selected_date.set(Calendar.SECOND,0)
+            val dpd = DatePickerDialog(
+                this,
+                R.style.MyDatePickerDialogTheme,
+                DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                    // Display Selected date in TextView
+                    date.text = "$dayOfMonth/${monthOfYear + 1}/$year"
+                    selected_date = Calendar.getInstance()
+                    selected_date.set(Calendar.YEAR, year)
+                    selected_date.set(Calendar.MONTH, monthOfYear)
+                    selected_date.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    selected_date.set(Calendar.HOUR_OF_DAY, 0)
+                    selected_date.set(Calendar.MINUTE, 0)
+                    selected_date.set(Calendar.SECOND, 0)
 
-                compareDate()
-            }, year, month, day)
+                    compareDate()
+                },
+                year,
+                month,
+                day
+            )
 
             dpd.show()
 
@@ -444,26 +462,25 @@ class EditActivity : AppCompatActivity() {
 
     }
 
-    fun compareDate() {
-        var compare = current_date.compareTo(selected_date)
+    private fun compareDate() {
+        val compare = current_date.compareTo(selected_date)
 
         // if compare > 0 Date 1 occurs after Date 2    increase year and set alarm
         // if compare < 0 Date 1 occurs before Date 2   set alarm directly
         // if compare = 0 Both dates are equal          set alarm directly
 
         if (compare > 0) {
-
-            var year = selected_date.get(Calendar.YEAR)
+            val year = selected_date.get(Calendar.YEAR)
             selected_date.set(Calendar.YEAR, year + 1)
         }
     }
 
-    fun setDefaultData(selectedBirthday: FSBirthday) {
+    private fun setDefaultData(selectedBirthday: FSBirthday) {
 
         person_name.setText(selectedBirthday.person_name)
-        date.setText(selectedBirthday.date)
+        date.text = selectedBirthday.date
 
-        if (selectedBirthday.event.equals("1")){
+        if (selectedBirthday.event.equals("1")) {
             event = 1  // 1 for birthday
             icn_birthday.setBackgroundResource(R.drawable.color_primary_bg)
             icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_white)
@@ -485,30 +502,29 @@ class EditActivity : AppCompatActivity() {
             icn_bir_tv.setTextColor(Color.parseColor("#000000"))
         }
 
-        if (selectedBirthday.isImportant.equals("true")){
+        if (selectedBirthday.isImportant == "true") {
             imp = true
             imp_title.setBackgroundResource(R.drawable.color_primary_bg)
             star.setImageResource(R.drawable.ic_gold_star)
             isImp_tv.setTextColor(Color.parseColor("#FFFFFF"))
-        }else {
+        } else {
             imp = false
             imp_title.setBackgroundResource(R.drawable.grey_bg)
             star.setImageResource(R.drawable.ic_black_star)
             isImp_tv.setTextColor(Color.parseColor("#000000"))
         }
 
-        if (!selectedBirthday.notes.equals("")){
+        if (selectedBirthday.notes != "") {
             notes.setText(selectedBirthday.notes)
         }
 
-        if (!selectedBirthday.profilePic.equals("")){
+        if (selectedBirthday.profilePic != "") {
             Glide.with(this)
                 .load(selectedBirthday.profilePic)
                 .into(profileImage)
         } else {
             profileImage.setImageResource(R.drawable.ic_circle_avatar)
         }
-
 
 
     }
@@ -523,9 +539,8 @@ class EditActivity : AppCompatActivity() {
                     data?.data?.let { uri ->
                         launchImageCrop(uri)
                     }
-                }
-                else{
-                    Log.e("12345", "Image selection error: Couldn't select that image from memory." )
+                } else {
+                    Log.e("12345", "Image selection error: Couldn't select that image from memory.")
                 }
             }
 
@@ -533,12 +548,12 @@ class EditActivity : AppCompatActivity() {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == Activity.RESULT_OK) {
 
-                    var file = File(result.uri.path)
+                    val file = File(result.uri.path)
                     Utils().LogPrint("original file size: " + file.length())
 
                     if (file.length() > 600000) { // greater than 600 kb
                         GlobalScope.launch {
-                            var compressedImage = Compressor.compress(applicationContext,file) {
+                            val compressedImage = Compressor.compress(applicationContext, file) {
                                 quality(50)
                             }
 
@@ -556,16 +571,15 @@ class EditActivity : AppCompatActivity() {
                         setImage(result.uri)
 
                     }
-                }
-                else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    Log.e("12345", "Crop error: ${result.getError()}" )
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Log.e("12345", "Crop error: ${result.error}")
                 }
             }
         }
 
     }
 
-    private fun launchImageCrop(uri: Uri){
+    private fun launchImageCrop(uri: Uri) {
         CropImage.activity(uri)
             .setGuidelines(CropImageView.Guidelines.OFF)
             .setFixAspectRatio(true)
@@ -578,22 +592,20 @@ class EditActivity : AppCompatActivity() {
         intent.type = "image/*"
         val mimeTypes = arrayOf("image/jpeg", "image/png", "image/jpg")
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
-        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         startActivityForResult(intent, GALLERY_REQUEST_CODE)
     }
 
-    private fun setImage(uri: Uri){
+    private fun setImage(uri: Uri) {
         Glide.with(this)
             .load(uri)
             .into(profileImage)
     }
 
-    fun getProfilePic() : ByteArray?
-    {
-        if (profileuri != null){
-            val iStream: InputStream? = getContentResolver().openInputStream(profileuri!!)
-            val inputData = iStream!!.readBytes()
-            return  inputData
+    private fun getProfilePic(): ByteArray? {
+        if (profileuri != null) {
+            val iStream: InputStream? = contentResolver.openInputStream(profileuri!!)
+            return iStream!!.readBytes()
         }
         return null
     }
