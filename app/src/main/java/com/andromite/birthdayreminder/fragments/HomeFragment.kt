@@ -24,6 +24,7 @@ import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
 import com.andromite.birthdayreminder.Utils.Utils
+import com.andromite.birthdayreminder.activities.EditActivity
 import com.andromite.birthdayreminder.activities.ViewBirthday
 import com.andromite.birthdayreminder.adapter.FSHomeAdapter
 import com.andromite.birthdayreminder.adapter.HomeAdapter
@@ -75,89 +76,11 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         val db = Firebase.firestore
         val storage = Firebase.storage
 
-        // add date selector    done
-
-        // add date validation function
-
-        // add select birthday or anniversary   done
-        // change colors if possible
-        // add others option
-        // add connect with contacts
 
         // get UID from sharedprefrences
         var uid = SharedPrefrenceUtils().getSP(context,"googleuid")
         Utils().LogPrint("googleuid" + uid)
 
-
-        //event = birthday or anniversary
-        view.icn_birthday.setOnClickListener {
-            event = 1  // 1 for birthday
-            view.icn_birthday.setBackgroundResource(R.drawable.color_primary_bg)
-            view.icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_white)
-            view.icn_bir_tv.setTextColor(Color.parseColor("#FFFFFF"))
-
-
-            view.icn_anniversary.setBackgroundResource(R.drawable.grey_bg)
-            view.icn_ann_iv.setImageResource(R.drawable.ic_anniversary)
-            view.icn_ann_tv.setTextColor(Color.parseColor("#000000"))
-        }
-
-        view.icn_anniversary.setOnClickListener {
-            event = 2 // 2 for anniversary
-            view.icn_anniversary.setBackgroundResource(R.drawable.color_primary_bg)
-            view.icn_ann_iv.setImageResource(R.drawable.ic_anniversary_white)
-            view.icn_ann_tv.setTextColor(Color.parseColor("#FFFFFF"))
-
-
-            view.icn_birthday.setBackgroundResource(R.drawable.grey_bg)
-            view.icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_black)
-            view.icn_bir_tv.setTextColor(Color.parseColor("#000000"))
-        }
-
-        // is important
-        view.imp_title.setOnClickListener {
-
-            if (!imp) {
-                imp = true
-                view.imp_title.setBackgroundResource(R.drawable.color_primary_bg)
-                view.star.setImageResource(R.drawable.ic_gold_star)
-                view.isImp_tv.setTextColor(Color.parseColor("#FFFFFF"))
-            } else {
-                imp = false
-                view.imp_title.setBackgroundResource(R.drawable.grey_bg)
-                view.star.setImageResource(R.drawable.ic_black_star)
-                view.isImp_tv.setTextColor(Color.parseColor("#000000"))
-            }
-
-
-        }
-
-        //Date
-        view.tv3.setOnClickListener {
-
-            val c = Calendar.getInstance()
-            val calYear = c.get(Calendar.YEAR)
-            val month = c.get(Calendar.MONTH)
-            val day = c.get(Calendar.DAY_OF_MONTH)
-
-
-            val dpd = DatePickerDialog(
-                requireContext(),
-                R.style.MyDatePickerDialogTheme,
-                DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                    // Display Selected date in TextView
-                    date.text = "$dayOfMonth/${monthOfYear + 1}/$year"
-                },
-                calYear,
-                month,
-                day
-            )
-            dpd.show()
-
-            select_birthday_error.visibility = View.GONE
-
-
-        }
 
         view.recyclerview.hasFixedSize()
         view.recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -172,6 +95,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
                     Utils().LogPrint("List of Birthdays" + doc.data.toString())
                     val dataList  : MutableMap<String, Any>? = doc.data
+
 //                    if (dataList != null) {
                         val birthday = FSBirthday(
                             doc.id,
@@ -202,165 +126,21 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         // FAB add Birthday Button
         view.floating_action_button.setOnClickListener {
 
-            val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
-                startView = view.floating_action_button
-                endView = view.cl_one
-                pathMotion = MaterialArcMotion()
-                scrimColor = Color.TRANSPARENT
-                duration = 500
-            }
+            var intent = Intent(context,EditActivity::class.java)
+            intent.putExtra("add_birthday",true);
+            startActivity(intent)
 
-            TransitionManager.beginDelayedTransition(view.cl_main, transform)
-            view.floating_action_button.visibility = View.GONE
-            view.cl_one.visibility = View.VISIBLE
-
-        }
-
-        //close and open transition FAB
-        view.btn_close.setOnClickListener {
-
-            val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
-                endView = view.floating_action_button
-                startView = view.cl_one
-                pathMotion = MaterialArcMotion()
-                scrimColor = Color.TRANSPARENT
-                duration = 700
-            }
-            TransitionManager.beginDelayedTransition(view.cl_main, transform)
-
-
-            //clear error message
-            tv1.error = null
-            select_birthday_error.visibility = View.GONE
-
-            //clear attributes
-            view.person_name.text!!.clear()
-            date.text = null
-
-            event = 1  // 1 for birthday
-            view.icn_birthday.setBackgroundResource(R.drawable.color_primary_bg)
-            view.icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_white)
-            view.icn_bir_tv.setTextColor(Color.parseColor("#FFFFFF"))
-
-
-            view.icn_anniversary.setBackgroundResource(R.drawable.grey_bg)
-            view.icn_ann_iv.setImageResource(R.drawable.ic_anniversary)
-            view.icn_ann_tv.setTextColor(Color.parseColor("#000000"))
-
-            imp = false
-            view.imp_title.setBackgroundResource(R.drawable.grey_bg)
-            view.star.setImageResource(R.drawable.ic_black_star)
-            view.isImp_tv.setTextColor(Color.parseColor("#000000"))
-
-            view.notes.text!!.clear()
-
-            //hide additional information
-            view.additional_info.visibility = View.VISIBLE
-
-            view.tv2.visibility = View.GONE
-            view.select_pic.visibility = View.GONE
-            view.imp_title.visibility = View.GONE
-
-
-
-
-
-
-
-            view.floating_action_button.visibility = View.VISIBLE
-            view.cl_one.visibility = View.GONE
-
-        }
-
-        //firestore add birthday
-        view.btn_submit.setOnClickListener {
-
-
-            home = HomeFragment()
-
-            val personName = person_name.text.toString().trim()
-            val date = date.text.toString().trim()
-            val isImportant = imp
-            val notes = notes.text.toString().trim()
-            val profilePic = getProfilePic()
-
-            //checking if the attributes are empty
-            if (personName.isEmpty()) {
-                tv1.error = getString(R.string.name_error_string)
-            } else if (date.isEmpty()) {
-                select_birthday_error.visibility = View.VISIBLE
-            }
-
-            if (personName.isNotEmpty() && date.isNotEmpty()) {
-                launch {
-                    val birthday = Birthday(personName, date, event, isImportant, notes, profilePic)
-//                    context?.let {
-//                        BirthdayDatabase(activity!!).getBirthdayDao().addBirthday(birthday)
-
-                    if (profilePicAdded) {
-                        Utils().LogPrint("inside if" )
-
-                        var ref = storage.reference.child("profilePic/" + uid + "/" +  profileuri!!.lastPathSegment + ".jpg")
-                        ref.putFile(profileuri!!).addOnSuccessListener {
-
-                            Utils().LogPrint("photo uploaded successfully" )
-
-                            ref.downloadUrl.addOnCompleteListener {
-
-                                Utils().LogPrint("Storage downloadedUrl : ${it.getResult()}" )
-
-                                var p = it.result.toString()
-
-                                // Create a new birthday in db
-                                val birthdayMap = hashMapOf(
-                                    "peron_name" to personName,
-                                    "date" to date,
-                                    "event" to event,
-                                    "isImportant" to isImportant,
-                                    "notes" to notes,
-                                    "profilePic" to it.result.toString()
-                                )
-
-                                // Add a new document with a generated ID
-                                db.collection("users/" + uid + "/Birthdays")
-                                    .add(birthdayMap)
-                                    .addOnSuccessListener { documentReference ->
-
-                                        Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
-
-                                        fragmentManager!!.beginTransaction()
-                                            .replace(R.id.frame_layout, home)
-                                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                            .commit()
-                                        Toast.makeText(activity, "Birthday Added", Toast.LENGTH_SHORT).show()
-
-                                    }
-                                    .addOnFailureListener { e ->
-                                        Utils().LogPrint( "Error adding document" + e)
-                                    }
-                            }
-                        }
-                    }
-                }
-
-//                fragmentManager!!.beginTransaction()
-//                    .replace(R.id.frame_layout, home)
-//                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                    .commit()
-            }
-
-        }
-
-        view.additional_info.setOnClickListener {
-            view.additional_info.visibility = View.GONE
-            view.tv2.visibility = View.VISIBLE
-            view.select_pic.visibility = View.VISIBLE
-            view.imp_title.visibility = View.VISIBLE
-        }
-
-        view.select_pic.setOnClickListener {
-
-            pickFromGallery()
+//            val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
+//                startView = view.floating_action_button
+//                endView = view.cl_one
+//                pathMotion = MaterialArcMotion()
+//                scrimColor = Color.TRANSPARENT
+//                duration = 500
+//            }
+//
+//            TransitionManager.beginDelayedTransition(view.cl_main, transform)
+//            view.floating_action_button.visibility = View.GONE
+//            view.cl_one.visibility = View.VISIBLE
 
         }
 
@@ -444,6 +224,258 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         val intent = Intent(requireContext(), ViewBirthday::class.java)
         intent.putExtra("selected_birthday", FSbirthdayList[imageData])
         startActivity(intent)
+
+    }
+
+    fun oldAnimationCode() {
+//        //event = birthday or anniversary
+//        view.icn_birthday.setOnClickListener {
+//            event = 1  // 1 for birthday
+//            view.icn_birthday.setBackgroundResource(R.drawable.color_primary_bg)
+//            view.icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_white)
+//            view.icn_bir_tv.setTextColor(Color.parseColor("#FFFFFF"))
+//
+//
+//            view.icn_anniversary.setBackgroundResource(R.drawable.grey_bg)
+//            view.icn_ann_iv.setImageResource(R.drawable.ic_anniversary)
+//            view.icn_ann_tv.setTextColor(Color.parseColor("#000000"))
+//        }
+//
+//        view.icn_anniversary.setOnClickListener {
+//            event = 2 // 2 for anniversary
+//            view.icn_anniversary.setBackgroundResource(R.drawable.color_primary_bg)
+//            view.icn_ann_iv.setImageResource(R.drawable.ic_anniversary_white)
+//            view.icn_ann_tv.setTextColor(Color.parseColor("#FFFFFF"))
+//
+//
+//            view.icn_birthday.setBackgroundResource(R.drawable.grey_bg)
+//            view.icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_black)
+//            view.icn_bir_tv.setTextColor(Color.parseColor("#000000"))
+//        }
+//
+//        // is important
+//        view.imp_title.setOnClickListener {
+//
+//            if (!imp) {
+//                imp = true
+//                view.imp_title.setBackgroundResource(R.drawable.color_primary_bg)
+//                view.star.setImageResource(R.drawable.ic_gold_star)
+//                view.isImp_tv.setTextColor(Color.parseColor("#FFFFFF"))
+//            } else {
+//                imp = false
+//                view.imp_title.setBackgroundResource(R.drawable.grey_bg)
+//                view.star.setImageResource(R.drawable.ic_black_star)
+//                view.isImp_tv.setTextColor(Color.parseColor("#000000"))
+//            }
+//
+//
+//        }
+//
+//        //Date
+//        view.tv3.setOnClickListener {
+//
+//            val c = Calendar.getInstance()
+//            val calYear = c.get(Calendar.YEAR)
+//            val month = c.get(Calendar.MONTH)
+//            val day = c.get(Calendar.DAY_OF_MONTH)
+//
+//
+//            val dpd = DatePickerDialog(
+//                requireContext(),
+//                R.style.MyDatePickerDialogTheme,
+//                DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+//                    // Display Selected date in TextView
+//                    date.text = "$dayOfMonth/${monthOfYear + 1}/$year"
+//                },
+//                calYear,
+//                month,
+//                day
+//            )
+//            dpd.show()
+//
+//            select_birthday_error.visibility = View.GONE
+//
+//
+//        }
+
+//        //close and open transition FAB
+//        view.btn_close.setOnClickListener {
+//
+//            val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
+//                endView = view.floating_action_button
+//                startView = view.cl_one
+//                pathMotion = MaterialArcMotion()
+//                scrimColor = Color.TRANSPARENT
+//                duration = 700
+//            }
+//            TransitionManager.beginDelayedTransition(view.cl_main, transform)
+//
+//
+//            //clear error message
+//            tv1.error = null
+//            select_birthday_error.visibility = View.GONE
+//
+//            //clear attributes
+//            view.person_name.text!!.clear()
+//            date.text = null
+//
+//            event = 1  // 1 for birthday
+//            view.icn_birthday.setBackgroundResource(R.drawable.color_primary_bg)
+//            view.icn_bir_iv.setImageResource(R.drawable.ic_birthdaycake_white)
+//            view.icn_bir_tv.setTextColor(Color.parseColor("#FFFFFF"))
+//
+//
+//            view.icn_anniversary.setBackgroundResource(R.drawable.grey_bg)
+//            view.icn_ann_iv.setImageResource(R.drawable.ic_anniversary)
+//            view.icn_ann_tv.setTextColor(Color.parseColor("#000000"))
+//
+//            imp = false
+//            view.imp_title.setBackgroundResource(R.drawable.grey_bg)
+//            view.star.setImageResource(R.drawable.ic_black_star)
+//            view.isImp_tv.setTextColor(Color.parseColor("#000000"))
+//
+//            view.notes.text!!.clear()
+//
+//            //hide additional information
+//            view.additional_info.visibility = View.VISIBLE
+//
+//            view.tv2.visibility = View.GONE
+//            view.select_pic.visibility = View.GONE
+//            view.imp_title.visibility = View.GONE
+//
+//
+//
+//
+//
+//
+//
+//            view.floating_action_button.visibility = View.VISIBLE
+//            view.cl_one.visibility = View.GONE
+//
+//        }
+//
+//        //firestore add birthday
+//        view.btn_submit.setOnClickListener {
+//
+//
+//            home = HomeFragment()
+//
+//            val personName = person_name.text.toString().trim()
+//            val date = date.text.toString().trim()
+//            val isImportant = imp
+//            val notes = notes.text.toString().trim()
+//            val profilePic = getProfilePic()
+//
+//            //checking if the attributes are empty
+//            if (personName.isEmpty()) {
+//                tv1.error = getString(R.string.name_error_string)
+//            } else if (date.isEmpty()) {
+//                select_birthday_error.visibility = View.VISIBLE
+//            }
+//
+//            if (personName.isNotEmpty() && date.isNotEmpty()) {
+//
+//                launch {
+//                    val birthday = Birthday(personName, date, event, isImportant, notes, profilePic)
+////                    context?.let {
+////                        BirthdayDatabase(activity!!).getBirthdayDao().addBirthday(birthday)
+//
+//                    if (profilePicAdded) {
+//                        Utils().LogPrint("inside if" )
+//
+//                        var ref = storage.reference.child("profilePic/" + uid + "/" +  profileuri!!.lastPathSegment + ".jpg")
+//                        ref.putFile(profileuri!!).addOnSuccessListener {
+//
+//                            Utils().LogPrint("photo uploaded successfully" )
+//
+//                            ref.downloadUrl.addOnCompleteListener {
+//
+//                                Utils().LogPrint("Storage downloadedUrl : ${it.getResult()}" )
+//
+//                                var p = it.result.toString()
+//
+//                                // Create a new birthday in db
+//                                val birthdayMap = hashMapOf(
+//                                    "peron_name" to personName,
+//                                    "date" to date,
+//                                    "event" to event,
+//                                    "isImportant" to isImportant,
+//                                    "notes" to notes,
+//                                    "profilePic" to it.result.toString()
+//                                )
+//
+//                                // Add a new document with a generated ID
+//                                db.collection("users/" + uid + "/Birthdays")
+//                                    .add(birthdayMap)
+//                                    .addOnSuccessListener { documentReference ->
+//
+//                                        Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
+//
+//                                        fragmentManager!!.beginTransaction()
+//                                            .replace(R.id.frame_layout, home)
+//                                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                                            .commit()
+//                                        Toast.makeText(activity, "Birthday Added", Toast.LENGTH_SHORT).show()
+//
+//                                    }
+//                                    .addOnFailureListener { e ->
+//                                        Utils().LogPrint( "Error adding document" + e)
+//                                    }
+//                            }
+//                        }
+//                    } else {
+//
+//                        // Create a new birthday in db
+//                        val birthdayMap = hashMapOf(
+//                            "peron_name" to personName,
+//                            "date" to date,
+//                            "event" to event,
+//                            "isImportant" to isImportant,
+//                            "notes" to notes,
+//                            "profilePic" to ""
+//                        )
+//
+//                        // Add a new document with a generated ID
+//                        db.collection("users/" + uid + "/Birthdays")
+//                            .add(birthdayMap)
+//                            .addOnSuccessListener { documentReference ->
+//
+//                                Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
+//
+//                                fragmentManager!!.beginTransaction()
+//                                    .replace(R.id.frame_layout, home)
+//                                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                                    .commit()
+//                                Toast.makeText(activity, "Birthday Added", Toast.LENGTH_SHORT).show()
+//
+//                            }
+//                            .addOnFailureListener { e ->
+//                                Utils().LogPrint( "Error adding document" + e)
+//                            }
+//
+//                    }
+//                }
+//
+////                fragmentManager!!.beginTransaction()
+////                    .replace(R.id.frame_layout, home)
+////                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+////                    .commit()
+//            }
+//
+//        }
+//
+//        view.additional_info.setOnClickListener {
+//            view.additional_info.visibility = View.GONE
+//            view.tv2.visibility = View.VISIBLE
+//            view.select_pic.visibility = View.VISIBLE
+//            view.imp_title.visibility = View.VISIBLE
+//        }
+//
+//        view.select_pic.setOnClickListener {
+//
+//            pickFromGallery()
+//
+//        }
 
     }
 

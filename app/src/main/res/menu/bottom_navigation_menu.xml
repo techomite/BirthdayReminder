@@ -11,9 +11,9 @@
         android:icon="@drawable/ic_important"
         android:title="@string/important"/>
 
-    <item
-        android:id="@+id/page_3"
-        android:enabled="true"
-        android:icon="@drawable/ic_poll_black_24dp"
-        android:title="@string/calender"/>
+<!--    <item-->
+<!--        android:id="@+id/page_3"-->
+<!--        android:enabled="true"-->
+<!--        android:icon="@drawable/ic_poll_black_24dp"-->
+<!--        android:title="@string/calender"/>-->
 </menu>

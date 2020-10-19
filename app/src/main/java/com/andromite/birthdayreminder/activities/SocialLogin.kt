@@ -27,14 +27,15 @@ class SocialLogin : AppCompatActivity() {
         var current_user = FirebaseAuth.getInstance().currentUser
 
         // send to MainActivity if user is logged in
-        if (current_user!=null) {
+//        if (current_user!=null) {
+//
+//            // save userUID to SP
+//            // send to HomeFragment
+//            Log.e("12345 current UID", current_user!!.uid)
+//            startActivity(Intent(this, MainActivity::class.java))
+//
+//        }
 
-            // save userUID to SP
-            // send to HomeFragment
-            Log.e("12345 current UID", current_user!!.uid)
-            startActivity(Intent(this, MainActivity::class.java))
-
-        }
 
         googleLogin.setOnClickListener {
 

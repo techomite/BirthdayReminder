@@ -1,5 +1,7 @@
 package com.andromite.birthdayreminder.activities
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
@@ -24,6 +26,8 @@ class MainActivity : AppCompatActivity() {
 
         var uid = SharedPrefrenceUtils().getSP(this,"googleuid")
         Utils().LogPrint(uid)
+
+        createNotificationChannel()
 
         home = HomeFragment()
         supportFragmentManager.beginTransaction()
@@ -51,16 +55,34 @@ class MainActivity : AppCompatActivity() {
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit()
                 }
-                R.id.page_3 -> {
-                    calender =
-                        CalenderFragment()
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout,calender)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .commit()
-                }
+//                R.id.page_3 -> {
+
+//                    calender =
+//                        CalenderFragment()
+//                    supportFragmentManager.beginTransaction()
+//                        .replace(R.id.frame_layout,calender)
+//                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                        .commit()
+//                }
             }
             true
         }
+    }
+
+    private fun createNotificationChannel() {
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+            var name = "Birthday Reminder";
+            var description = "Birthday Reminder Channel"
+            var importance = NotificationManager.IMPORTANCE_HIGH
+            var channel =NotificationChannel("Birthday Reminder",name,importance)
+            channel.description = description
+
+            var manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+
+        }
+
     }
 }

@@ -3,27 +3,31 @@ package com.andromite.birthdayreminder.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.adapter.FSHomeAdapter
-import com.andromite.birthdayreminder.db.Birthday
+import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
+import com.andromite.birthdayreminder.Utils.Utils
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kotlinx.android.synthetic.main.activity_view_birthday.*
-import kotlinx.android.synthetic.main.fragment_home.view.*
 
 class ViewBirthday : AppCompatActivity() {
 
     lateinit var FSselected_birthday : FSBirthday
+    lateinit var uid : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_birthday)
 
         val db = Firebase.firestore
+        val storage = Firebase.storage
+        uid = SharedPrefrenceUtils().getSP(this,"googleuid")
+        Utils().LogPrint(uid)
 
 
         FSselected_birthday = getIntent().extras?.get("selected_birthday") as FSBirthday
@@ -37,6 +41,46 @@ class ViewBirthday : AppCompatActivity() {
             startActivity(intent)
 
         }
+
+        //delete birthday
+        delete_birthday.setOnClickListener {
+
+            db.collection("users/" + uid + "/Birthdays").document(FSselected_birthday.id)
+                .delete()
+                .addOnSuccessListener {
+                    Utils().LogPrint( "DocumentSnapshot successfully deleted!")
+                    startActivity(Intent(this,MainActivity::class.java))
+
+                }
+                .addOnFailureListener { e -> Utils().LogPrint("Error deleting document $e") }
+        }
+
+        if (!FSselected_birthday.profilePic.equals("")){
+
+            var delref = storage.getReferenceFromUrl(FSselected_birthday.profilePic)
+            delref.delete()
+                .addOnSuccessListener { Utils().LogPrint( "Photo successfully deleted!") }
+                .addOnFailureListener { e -> Utils().LogPrint("Error deleting photo $e") }
+
+        }
+
+        profilePic.setOnClickListener {
+
+            if (!FSselected_birthday.profilePic.equals("")) {
+                var intent = Intent(this, ViewPhotoActivity::class.java)
+                intent.putExtra("photourl",FSselected_birthday.profilePic)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this,"No Photo",Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
+    }
+
+    fun deleteAlarmReminder() {
+
+
 
     }
 
@@ -57,6 +101,10 @@ class ViewBirthday : AppCompatActivity() {
             imageView2.setImageResource(R.drawable.ic_birthdaycake_black)
         } else {
             imageView2.setImageResource(R.drawable.ic_anniversary)
+        }
+
+        if (!FSselected_birthday.profilePic.equals("")) {
+            Glide.with(this).load(FSselected_birthday.profilePic).into(profilePic)
         }
     }
 }

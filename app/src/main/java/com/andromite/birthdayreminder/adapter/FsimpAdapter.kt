@@ -8,11 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.fragments.HomeFragment
+import com.andromite.birthdayreminder.fragments.ImportantFragment
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.layout_home_recyclerview.view.*
 import java.io.Serializable
 
-class FSHomeAdapter(val birthdays: List<FSBirthday>, val onRecyclerItemClickListener: HomeFragment) : RecyclerView.Adapter<FSHomeAdapter.BirthdayViewHolder>() {
+class FsimpAdapter(val birthdays: List<FSBirthday>, val onRecyclerItemClickListener: ImportantFragment) : RecyclerView.Adapter<FsimpAdapter.BirthdayViewHolder>() {
 
     private val onImageClickListener: OnImageClickListener? = null
 

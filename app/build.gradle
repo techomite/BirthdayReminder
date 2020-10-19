@@ -68,4 +68,15 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx:21.4.3'
     implementation 'com.firebaseui:firebase-ui-auth:6.2.0'
     implementation 'com.google.firebase:firebase-storage-ktx:19.1.1'
+
+    //photo view
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+
+    //image compression library
+    implementation 'id.zelory:compressor:3.0.0'
+
+//    // notification worker manager
+//    implementation 'androidx.work:work-runtime:2.1.0-alpha02'
+
+
 }

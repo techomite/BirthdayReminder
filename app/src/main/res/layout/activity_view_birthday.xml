@@ -14,7 +14,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintCircleRadius="10dp"
-        android:visibility="gone">
+        android:visibility="visible">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_birthday"
@@ -22,11 +34,25 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/inner_details"
             android:layout_marginEnd="30dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/delete_birthday"
             app:layout_constraintTop_toTopOf="@+id/inner_details"
             android:src="@drawable/ic_mode_edit_black_24dp"
             android:background="@color/colorPrimary"
             android:layout_marginRight="30dp" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/delete_birthday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/inner_details"
+            android:layout_marginEnd="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/inner_details"
+            android:src="@drawable/ic_delete_black_24dp"
+            android:background="@color/colorPrimary"
+            android:layout_marginRight="30dp" />
+        
+
 
         <ImageView
             android:id="@+id/profilePic"
