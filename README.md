@@ -19,11 +19,4 @@ Photo View - https://github.com/chrisbanes/PhotoView
 
 # How does it look?
 
-![Screenshot_20201105-012410](https://user-images.githubusercontent.com/43872849/98164262-04776680-1f0a-11eb-83f1-eae357757894.jpg =800x400)
-
-![Screenshot_20201105-015245](https://user-images.githubusercontent.com/43872849/98164368-2a9d0680-1f0a-11eb-9309-1580f2204732.jpg =800x400)
-
-![Screenshot_20201105-014654](https://user-images.githubusercontent.com/43872849/98164346-21139e80-1f0a-11eb-9893-fd258b7f417f.jpg =800x400)
-
-
-
+<img src="https://user-images.githubusercontent.com/43872849/98164262-04776680-1f0a-11eb-83f1-eae357757894.jpg" width="350"  /> <img src="https://user-images.githubusercontent.com/43872849/98164368-2a9d0680-1f0a-11eb-9309-1580f2204732.jpg" width="350"  /> <img src="https://user-images.githubusercontent.com/43872849/98164346-21139e80-1f0a-11eb-9893-fd258b7f417f.jpg" width="350"  />
