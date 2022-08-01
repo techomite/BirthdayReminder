@@ -15,7 +15,7 @@ import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
 import com.andromite.birthdayreminder.Utils.Utils
-import com.andromite.birthdayreminder.activities.ViewBirthday
+import com.andromite.birthdayreminder.activity.ViewBirthday
 import com.andromite.birthdayreminder.adapter.FsimpAdapter
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase

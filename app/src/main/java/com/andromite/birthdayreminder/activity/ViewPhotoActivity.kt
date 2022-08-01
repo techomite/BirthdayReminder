@@ -1,4 +1,4 @@
-package com.andromite.birthdayreminder.activities
+package com.andromite.birthdayreminder.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,8 +12,8 @@ class ViewPhotoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_photo)
 
-        var photourl = intent.getStringExtra("photourl")
-        if (photourl.isNotEmpty()) {
+        val photourl = intent.getStringExtra("photourl")
+        if (photourl!!.isNotEmpty()) {
             Glide.with(this).load(photourl).into(photo)
         }
     }

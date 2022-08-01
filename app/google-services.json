@@ -1,42 +1,41 @@
 {
   "project_info": {
-    "project_number": "233261035710",
-    "firebase_url": "https://birthday-reminder-75356.firebaseio.com",
-    "project_id": "birthday-reminder-75356",
-    "storage_bucket": "birthday-reminder-75356.appspot.com"
+    "project_number": "551301423686",
+    "project_id": "birthday-reminder-a18c2",
+    "storage_bucket": "birthday-reminder-a18c2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:233261035710:android:5165308e758fb288e0aeef",
+        "mobilesdk_app_id": "1:551301423686:android:668fb16562c9667b8aa047",
         "android_client_info": {
           "package_name": "com.andromite.birthdayreminder"
         }
       },
       "oauth_client": [
         {
-          "client_id": "233261035710-q0og2j899kbrbg1f04v522mbofprs91n.apps.googleusercontent.com",
+          "client_id": "551301423686-pjs56jito3te6i67hj7e8b4i0jdo0n2i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.andromite.birthdayreminder",
-            "certificate_hash": "4f5172d2691705636a5efba3559825c936c7dff3"
+            "certificate_hash": "df4749e2e18b169e160e2aaeab3bed73f26d7f8c"
           }
         },
         {
-          "client_id": "233261035710-5ogk9v9ss2imlcuumbk49v4323t91luh.apps.googleusercontent.com",
+          "client_id": "551301423686-e3gmvospph09i57sp03m641hjovqi7ia.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBG3ctWDRg_tsnFAclxOuNZiX2YVZoDzI0"
+          "current_key": "AIzaSyDwwHZz50WUkvkkkyoLVFtejLx1S8GL1h4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "233261035710-5ogk9v9ss2imlcuumbk49v4323t91luh.apps.googleusercontent.com",
+              "client_id": "551301423686-e3gmvospph09i57sp03m641hjovqi7ia.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

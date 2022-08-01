@@ -2,21 +2,16 @@ package com.andromite.birthdayreminder.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.DatePickerDialog
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.BaseFragment
@@ -24,15 +19,12 @@ import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
 import com.andromite.birthdayreminder.Utils.Utils
-import com.andromite.birthdayreminder.activities.EditActivity
-import com.andromite.birthdayreminder.activities.ViewBirthday
+import com.andromite.birthdayreminder.activity.EditActivity
+import com.andromite.birthdayreminder.activity.ViewBirthday
 import com.andromite.birthdayreminder.adapter.FSHomeAdapter
 import com.andromite.birthdayreminder.adapter.HomeAdapter
 import com.andromite.birthdayreminder.db.Birthday
-import com.andromite.birthdayreminder.db.BirthdayDatabase
 import com.bumptech.glide.Glide
-import com.google.android.material.transition.MaterialArcMotion
-import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -40,9 +32,7 @@ import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
-import kotlinx.coroutines.launch
 import java.io.InputStream
-import java.util.*
 import kotlin.collections.ArrayList
 
 

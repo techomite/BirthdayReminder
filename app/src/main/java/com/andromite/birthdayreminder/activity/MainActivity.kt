@@ -1,4 +1,4 @@
-package com.andromite.birthdayreminder.activities
+package com.andromite.birthdayreminder.activity
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

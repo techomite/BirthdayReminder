@@ -3,6 +3,8 @@
     package="com.andromite.birthdayreminder">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -11,19 +13,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.SplashScreen">
+        <activity android:name=".activity.SplashScreen"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ViewPhotoActivity" />
-        <activity android:name=".activities.SocialLogin"/>
-        <activity android:name=".activities.EditActivity" />
-        <activity android:name=".activities.ViewBirthday" />
+        <activity android:name=".activity.ViewPhotoActivity" />
+        <activity android:name=".activity.SocialLogin"/>
+        <activity android:name=".activity.EditActivity" />
+        <activity android:name=".activity.ViewBirthday" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activity.MainActivity"
             android:windowSoftInputMode="adjustPan">
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
