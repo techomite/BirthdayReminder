@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         var uid = SharedPrefrenceUtils().getSP(this,"googleuid")
-        Utils().LogPrint(uid)
+        Utils.flog(uid)
 
         createNotificationChannel()
 

@@ -57,7 +57,7 @@ class ImportantFragment : Fragment() {
 
         // get UID from sharedprefrences
         var uid = SharedPrefrenceUtils().getSP(context,"googleuid")
-        Utils().LogPrint("googleuid" + uid)
+        Utils.flog("googleuid" + uid)
 
 
         db.collection("users/" + uid + "/Birthdays").whereEqualTo("isImportant", true).get()
@@ -65,7 +65,7 @@ class ImportantFragment : Fragment() {
 
                 for (doc in it.documents) {
 
-                    Utils().LogPrint("List of important Birthdays" + doc.data.toString())
+                    Utils.flog("List of important Birthdays" + doc.data.toString())
                     val dataList  : MutableMap<String, Any>? = doc.data
 
 //                    if (dataList != null) {

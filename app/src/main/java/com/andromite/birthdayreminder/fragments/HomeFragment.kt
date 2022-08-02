@@ -69,7 +69,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
         // get UID from sharedprefrences
         var uid = SharedPrefrenceUtils().getSP(context,"googleuid")
-        Utils().LogPrint("googleuid" + uid)
+        Utils.flog("googleuid" + uid)
 
 
         view.recyclerview.hasFixedSize()
@@ -83,7 +83,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
                 for (doc in it.documents) {
 
-                    Utils().LogPrint("List of Birthdays" + doc.data.toString())
+                    Utils.flog("List of Birthdays" + doc.data.toString())
                     val dataList  : MutableMap<String, Any>? = doc.data
 
 //                    if (dataList != null) {
@@ -119,6 +119,8 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
             var intent = Intent(context,EditActivity::class.java)
             intent.putExtra("add_birthday",true);
             startActivity(intent)
+
+
 
 //            val transform: MaterialContainerTransform = MaterialContainerTransform().apply {
 //                startView = view.floating_action_button
@@ -371,16 +373,16 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 ////                        BirthdayDatabase(activity!!).getBirthdayDao().addBirthday(birthday)
 //
 //                    if (profilePicAdded) {
-//                        Utils().LogPrint("inside if" )
+//                        Utils.flog("inside if" )
 //
 //                        var ref = storage.reference.child("profilePic/" + uid + "/" +  profileuri!!.lastPathSegment + ".jpg")
 //                        ref.putFile(profileuri!!).addOnSuccessListener {
 //
-//                            Utils().LogPrint("photo uploaded successfully" )
+//                            Utils.flog("photo uploaded successfully" )
 //
 //                            ref.downloadUrl.addOnCompleteListener {
 //
-//                                Utils().LogPrint("Storage downloadedUrl : ${it.getResult()}" )
+//                                Utils.flog("Storage downloadedUrl : ${it.getResult()}" )
 //
 //                                var p = it.result.toString()
 //
@@ -399,7 +401,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 //                                    .add(birthdayMap)
 //                                    .addOnSuccessListener { documentReference ->
 //
-//                                        Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
+//                                        Utils.flog("DocumentSnapshot added with ID: ${documentReference.id}" )
 //
 //                                        fragmentManager!!.beginTransaction()
 //                                            .replace(R.id.frame_layout, home)
@@ -409,7 +411,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 //
 //                                    }
 //                                    .addOnFailureListener { e ->
-//                                        Utils().LogPrint( "Error adding document" + e)
+//                                        Utils.flog( "Error adding document" + e)
 //                                    }
 //                            }
 //                        }
@@ -430,7 +432,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 //                            .add(birthdayMap)
 //                            .addOnSuccessListener { documentReference ->
 //
-//                                Utils().LogPrint("DocumentSnapshot added with ID: ${documentReference.id}" )
+//                                Utils.flog("DocumentSnapshot added with ID: ${documentReference.id}" )
 //
 //                                fragmentManager!!.beginTransaction()
 //                                    .replace(R.id.frame_layout, home)
@@ -440,7 +442,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 //
 //                            }
 //                            .addOnFailureListener { e ->
-//                                Utils().LogPrint( "Error adding document" + e)
+//                                Utils.flog( "Error adding document" + e)
 //                            }
 //
 //                    }

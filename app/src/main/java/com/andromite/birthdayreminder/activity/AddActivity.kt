@@ -54,7 +54,7 @@ import java.io.File
 import java.io.InputStream
 import java.util.*
 
-class EditActivity : AppCompatActivity() {
+class AddActivity : AppCompatActivity() {
 
     var event: Int = 1
     var imp: Boolean = false
@@ -71,9 +71,16 @@ class EditActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_edit)
 
+
+
         uid = SharedPrefrenceUtils().getSP(this, "googleuid")
+
+        // call firestore method in controller class convert to data object and return here.
+        // use the object to update the views.
+
         Utils.flog(uid)
         db = Firebase.firestore
 
@@ -124,9 +131,9 @@ class EditActivity : AppCompatActivity() {
 
     }
 
-//    private fun addBirthdayToFireStore() {
-//        FireStoreUtils().addBirthdayFireStore()
-//    }
+    private fun addBirthdayToFireStore() {
+//        FireStoreUtils().readFirestoreData()
+    }
 
     private fun addBirthdayFireStore() {
         home = HomeFragment()

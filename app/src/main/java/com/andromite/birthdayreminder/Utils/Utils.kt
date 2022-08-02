@@ -4,8 +4,15 @@ import android.util.Log
 
 class Utils {
 
-    fun LogPrint(value: Any) {
-        Log.e("asdfasdf", value.toString())
-    }
+    companion object{
+        fun flog(value: Any) {
+            if (Constants.ENABLE_LOGS)
+            Log.i("BR", ":-: $value :-:")
+        }
 
+        fun floge(value: Any) {
+            if (Constants.ENABLE_LOGS)
+                Log.e("asdfasdf", ":-: $value :-:")
+        }
+    }
 }

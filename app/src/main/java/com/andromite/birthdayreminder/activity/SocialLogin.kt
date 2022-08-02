@@ -1,24 +1,24 @@
 package com.andromite.birthdayreminder.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.Utils.Constants.Companion.RC_SIGN_IN
+import com.andromite.birthdayreminder.Utils.FireStoreUtils
+import com.andromite.birthdayreminder.Utils.FirestoreListener
 import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
 import com.andromite.birthdayreminder.Utils.Utils
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.IdpResponse
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_social_login.*
 
-class SocialLogin : AppCompatActivity() {
+class SocialLogin : AppCompatActivity(), FirestoreListener {
 
     private val db = Firebase.firestore
 
@@ -32,7 +32,12 @@ class SocialLogin : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_social_login)
 
-        startActivity(Intent(this, MainActivity::class.java))
+//        startActivity(Intent(this, MainActivity::class.java))
+
+//        FireStoreUtils().readAllBirthdays(this)
+//        FireStoreUtils().readCollection("asdfasdf",this)
+//        var birthday = FSBirthday("a","a","a","a","a","a","a")
+//        FireStoreUtils().addBirthday(birthday)
 
         //region SignIn Process
         googleLogin.setOnClickListener {
@@ -78,8 +83,12 @@ class SocialLogin : AppCompatActivity() {
             // ...
 
             Toast.makeText(this, "Login Failed, Please try again! ${response?.error}", Toast.LENGTH_LONG).show()
-            Utils().LogPrint("response error: ${response?.error}")
+            Utils.flog("response error: ${response?.error}")
 
         }
+    }
+
+    override fun response(fsBirthday: FSBirthday) {
+        Utils.floge("Social Login: $fsBirthday")
     }
 }

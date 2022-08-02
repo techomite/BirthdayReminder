@@ -27,7 +27,7 @@ class ViewBirthday : AppCompatActivity() {
         val db = Firebase.firestore
         val storage = Firebase.storage
         uid = SharedPrefrenceUtils().getSP(this,"googleuid")
-        Utils().LogPrint(uid)
+        Utils.flog(uid)
 
 
         FSselected_birthday = getIntent().extras?.get("selected_birthday") as FSBirthday
@@ -48,19 +48,19 @@ class ViewBirthday : AppCompatActivity() {
             db.collection("users/" + uid + "/Birthdays").document(FSselected_birthday.id)
                 .delete()
                 .addOnSuccessListener {
-                    Utils().LogPrint( "DocumentSnapshot successfully deleted!")
+                    Utils.flog( "DocumentSnapshot successfully deleted!")
                     startActivity(Intent(this,MainActivity::class.java))
 
                 }
-                .addOnFailureListener { e -> Utils().LogPrint("Error deleting document $e") }
+                .addOnFailureListener { e -> Utils.flog("Error deleting document $e") }
         }
 
         if (!FSselected_birthday.profilePic.equals("")){
 
             var delref = storage.getReferenceFromUrl(FSselected_birthday.profilePic)
             delref.delete()
-                .addOnSuccessListener { Utils().LogPrint( "Photo successfully deleted!") }
-                .addOnFailureListener { e -> Utils().LogPrint("Error deleting photo $e") }
+                .addOnSuccessListener { Utils.flog( "Photo successfully deleted!") }
+                .addOnFailureListener { e -> Utils.flog("Error deleting photo $e") }
 
         }
 
