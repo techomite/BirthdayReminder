@@ -4,11 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.Utils.FireStoreUtils
-import com.andromite.birthdayreminder.Utils.FirestoreListener
-import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
+import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -18,7 +15,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_social_login.*
 
-class SocialLogin : AppCompatActivity(), FirestoreListener {
+class SocialLogin : AppCompatActivity() {
 
     private val db = Firebase.firestore
 
@@ -32,12 +29,7 @@ class SocialLogin : AppCompatActivity(), FirestoreListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_social_login)
 
-//        startActivity(Intent(this, MainActivity::class.java))
-
-//        FireStoreUtils().readAllBirthdays(this)
-//        FireStoreUtils().readCollection("asdfasdf",this)
-        var birthday = FSBirthday("b","b","b","b","b","b","b")
-        FireStoreUtils().updateBirthday("asdf",birthday, this)
+        startActivity(Intent(this, MainActivity::class.java))
 
         //region SignIn Process
         googleLogin.setOnClickListener {
@@ -73,7 +65,7 @@ class SocialLogin : AppCompatActivity(), FirestoreListener {
             )
 
             db.collection("users").document(userUID).set(userIdentity)
-            SharedPrefrenceUtils().saveSP(this, "googleuid", userUID)
+            SP().save(this, "googleuid", userUID)
             startActivity(Intent(this, MainActivity::class.java))
             // ...
         } else {
@@ -86,9 +78,5 @@ class SocialLogin : AppCompatActivity(), FirestoreListener {
             Utils.flog("response error: ${response?.error}")
 
         }
-    }
-
-    override fun response(response: Any) {
-        Utils.floge("Social Login: $response")
     }
 }

@@ -1,5 +1,6 @@
 package com.andromite.birthdayreminder.Utils
 
+import android.content.Context
 import com.andromite.birthdayreminder.FSBirthday
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -11,9 +12,10 @@ class FireStoreUtils {
 
     var db = Firebase.firestore
 
-    fun readAllBirthdays(listener: FirestoreListener) {
+    fun readAllBirthdays(context: Context, listener: FirestoreListener) {
+        val userId = SP.get(context, Enums.UserId.name)
 
-        db.collection(Enums.Users.name).document("userOne").collection(Enums.Birthdays.name)
+        db.collection(Enums.Users.name).document(userId).collection(Enums.Birthdays.name)
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
@@ -28,8 +30,10 @@ class FireStoreUtils {
             }
     }
 
-    fun viewBirthday(docId: String, listener: FirestoreListener) {
-        val docRef = db.collection(Enums.Users.name).document("userid")
+    fun viewBirthday(context: Context, docId: String, listener: FirestoreListener) {
+        val userId = SP.get(context, Enums.UserId.name)
+
+        val docRef = db.collection(Enums.Users.name).document(userId)
                        .collection(Enums.Birthdays.name).document(docId)
         docRef.get()
             .addOnSuccessListener { document ->
@@ -46,7 +50,9 @@ class FireStoreUtils {
             }
     }
 
-    fun addBirthday(fsBirthday: FSBirthday, listener: FirestoreListener) {
+    fun addBirthday(context: Context, fsBirthday: FSBirthday, listener: FirestoreListener) {
+        val userId = SP.get(context, Enums.UserId.name)
+
         // Create a new user with a first and last name
         val user = hashMapOf(
             Enums.id.name to fsBirthday.id,
@@ -59,7 +65,7 @@ class FireStoreUtils {
         )
 
 // Add a new document with a generated ID
-        db.collection(Enums.Users.name).document("userOne").collection(Enums.Birthdays.name)
+        db.collection(Enums.Users.name).document(userId).collection(Enums.Birthdays.name)
             .add(user)
             .addOnSuccessListener { documentReference ->
                 Utils.floge("DocumentSnapshot added with ID: ${documentReference.id}")
@@ -71,7 +77,8 @@ class FireStoreUtils {
             }
     }
 
-    fun updateBirthday(docId: String, fsBirthday: FSBirthday, listener: FirestoreListener) {
+    fun updateBirthday(context: Context, docId: String, fsBirthday: FSBirthday, listener: FirestoreListener) {
+        val userId = SP.get(context, Enums.UserId.name)
         // Create a new user with a first and last name
         val user = hashMapOf(
             Enums.id.name to fsBirthday.id,
@@ -83,7 +90,7 @@ class FireStoreUtils {
             Enums.profilePic.name to fsBirthday.profilePic,
         )
 
-        db.collection(Enums.Users.name).document("userOne")
+        db.collection(Enums.Users.name).document(userId)
           .collection(Enums.Birthdays.name).document(docId)
             .update(user as Map<String, Any>)
             .addOnSuccessListener {

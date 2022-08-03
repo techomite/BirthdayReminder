@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
+import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.fragments.CalenderFragment
 import com.andromite.birthdayreminder.fragments.HomeFragment
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var uid = SharedPrefrenceUtils().getSP(this,"googleuid")
+        var uid = SP().get(this,"googleuid")
         Utils.flog(uid)
 
         createNotificationChannel()

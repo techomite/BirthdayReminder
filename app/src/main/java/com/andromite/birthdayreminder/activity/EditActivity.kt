@@ -16,14 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.Utils.Constants.Companion.GALLERY_REQUEST_CODE
-import com.andromite.birthdayreminder.Utils.FireStoreUtils
-import com.andromite.birthdayreminder.Utils.SharedPrefrenceUtils
+import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.broadcast.ReminderBroadcast
 import com.andromite.birthdayreminder.db.Birthday
 import com.andromite.birthdayreminder.fragments.HomeFragment
 import com.bumptech.glide.Glide
-import com.bumptech.glide.util.Util
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
@@ -73,7 +71,7 @@ class EditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
-        uid = SharedPrefrenceUtils().getSP(this, "googleuid")
+        uid = SP().get(this, "googleuid")
         Utils.flog(uid)
         db = Firebase.firestore
 
