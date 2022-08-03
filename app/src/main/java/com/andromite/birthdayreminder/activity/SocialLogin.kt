@@ -36,8 +36,8 @@ class SocialLogin : AppCompatActivity(), FirestoreListener {
 
 //        FireStoreUtils().readAllBirthdays(this)
 //        FireStoreUtils().readCollection("asdfasdf",this)
-//        var birthday = FSBirthday("a","a","a","a","a","a","a")
-//        FireStoreUtils().addBirthday(birthday)
+        var birthday = FSBirthday("b","b","b","b","b","b","b")
+        FireStoreUtils().updateBirthday("asdf",birthday, this)
 
         //region SignIn Process
         googleLogin.setOnClickListener {
@@ -88,7 +88,7 @@ class SocialLogin : AppCompatActivity(), FirestoreListener {
         }
     }
 
-    override fun response(fsBirthday: FSBirthday) {
-        Utils.floge("Social Login: $fsBirthday")
+    override fun response(response: Any) {
+        Utils.floge("Social Login: $response")
     }
 }

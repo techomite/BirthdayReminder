@@ -12,6 +12,13 @@ enum class Enums {
     events,
     isImportant,
     notes,
-    profilePic
+    profilePic,
+
+    //Firestore responses
+    UPDATE_REQ_SUCESS,
+    UPDATE_REQ_FAILED,
+    ADD_REQ_SUCCESS,
+    ADD_REQ_FAILED
+
 
 }
