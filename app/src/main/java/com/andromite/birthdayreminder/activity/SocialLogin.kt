@@ -2,15 +2,22 @@ package com.andromite.birthdayreminder.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.Enums
 import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_social_login.*
@@ -34,10 +41,10 @@ class SocialLogin : AppCompatActivity() {
         //region SignIn Process
         googleLogin.setOnClickListener {
 
-// Choose authentication providers
+            // Choose authentication providers
             val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
 
-// Create and launch sign-in intent
+            // Create and launch sign-in intent
             val signInIntent = AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
@@ -56,16 +63,14 @@ class SocialLogin : AppCompatActivity() {
 
             val userUID = user!!.uid
 
-            //add user to the collection in db
-            //create SharedPreference for user_id
-
             val userIdentity = hashMapOf(
                 "displayName" to user.displayName,
                 "email" to user.email
             )
 
-            db.collection("users").document(userUID).set(userIdentity)
-            SP().save(this, "googleuid", userUID)
+//            db.collection(Enums.Users.name).document(userUID).set(userIdentity)
+
+            SP.save(this, Enums.UserId.name, userUID)
             startActivity(Intent(this, MainActivity::class.java))
             // ...
         } else {

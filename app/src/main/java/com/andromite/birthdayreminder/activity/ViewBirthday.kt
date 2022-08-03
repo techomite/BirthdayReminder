@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.Enums
 import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.bumptech.glide.Glide
@@ -26,7 +27,7 @@ class ViewBirthday : AppCompatActivity() {
 
         val db = Firebase.firestore
         val storage = Firebase.storage
-        uid = SP().get(this,"googleuid")
+        uid = SP.get(this,Enums.UserId.name)
         Utils.flog(uid)
 
 

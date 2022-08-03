@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.BaseFragment
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.Enums
 import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.activity.EditActivity
@@ -68,8 +69,8 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
 
         // get UID from sharedprefrences
-        var uid = SP().get(context,"googleuid")
-        Utils.flog("googleuid" + uid)
+        var uid = context?.let { SP.get(it, Enums.UserId.name) }
+        Utils.flog(Enums.UserId.name + uid)
 
 
         view.recyclerview.hasFixedSize()

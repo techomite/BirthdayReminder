@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.Utils.Constants.Companion.GALLERY_REQUEST_CODE
+import com.andromite.birthdayreminder.Utils.Enums
 import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.broadcast.ReminderBroadcast
@@ -71,7 +72,7 @@ class EditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
-        uid = SP().get(this, "googleuid")
+        uid = SP.get(this, Enums.UserId.name)
         Utils.flog(uid)
         db = Firebase.firestore
 

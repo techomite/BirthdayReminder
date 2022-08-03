@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
+import com.andromite.birthdayreminder.Utils.Enums
 import com.andromite.birthdayreminder.Utils.SP
 import com.andromite.birthdayreminder.Utils.Utils
 import com.andromite.birthdayreminder.activity.ViewBirthday
@@ -56,8 +57,8 @@ class ImportantFragment : Fragment() {
 
 
         // get UID from sharedprefrences
-        var uid = SP().get(context,"googleuid")
-        Utils.flog("googleuid" + uid)
+        var uid = context?.let { SP.get(it, Enums.UserId.name) }
+        Utils.flog(Enums.UserId.name + uid)
 
 
         db.collection("users/" + uid + "/Birthdays").whereEqualTo("isImportant", true).get()
