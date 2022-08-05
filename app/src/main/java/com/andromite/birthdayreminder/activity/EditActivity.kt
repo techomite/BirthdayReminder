@@ -15,10 +15,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.Utils.*
-import com.andromite.birthdayreminder.Utils.Constants.Companion.GALLERY_REQUEST_CODE
+import com.andromite.birthdayreminder.utils.*
+import com.andromite.birthdayreminder.utils.Constants.Companion.GALLERY_REQUEST_CODE
 import com.andromite.birthdayreminder.broadcast.ReminderBroadcast
-import com.andromite.birthdayreminder.db.Birthday
 import com.andromite.birthdayreminder.fragments.HomeFragment
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
@@ -53,13 +52,12 @@ import java.io.File
 import java.io.InputStream
 import java.util.*
 
-class EditActivity : AppCompatActivity(), FirestoreListener {
+class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListener {
 
     var event: Int = 1
     var imp: Boolean = false
-    var profileuri: Uri? = null
+    lateinit var profileuri: Uri
     lateinit var id: String
-    lateinit var db: FirebaseFirestore
     lateinit var selected_birthday: FSBirthday
     lateinit var uid: String
     val storage = Firebase.storage
@@ -67,20 +65,23 @@ class EditActivity : AppCompatActivity(), FirestoreListener {
     lateinit var home: HomeFragment
     lateinit var current_date: Calendar
     lateinit var selected_date: Calendar
+    lateinit var docId : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
         uid = SP.get(this, Enums.UserId.name)
-        db = Firebase.firestore
 
 
         if (intent.hasExtra("add_birthday")) {
+            docId = System.currentTimeMillis().toString()
 
         } else {        // view_birthday
 
-            selected_birthday = intent.extras?.get("birthday") as FSBirthday
+//            selected_birthday = intent.extras?.get("birthday") as FSBirthday
+            var docId = intent.getStringExtra("docId")
+            FireStoreUtils().viewBirthday(this, docId.toString(), this) // update selected birthday
 //        id = selected_birthday.id
             setDefaultData(selected_birthday)
 
@@ -93,7 +94,7 @@ class EditActivity : AppCompatActivity(), FirestoreListener {
         btn_submitt.setOnClickListener {
             saveToDB()        // old Room DB code
             if (intent.hasExtra("add_birthday")) {
-                addBirthdayFireStore()
+                uploadProfilePic()
 //                setReminder()
             } else if (intent.hasExtra("edit_birthday")) {
                 updateFireStore()
@@ -121,10 +122,6 @@ class EditActivity : AppCompatActivity(), FirestoreListener {
 
 
     }
-
-//    private fun addBirthdayToFireStore() {
-//        FireStoreUtils().addBirthdayFireStore()
-//    }
 
     private fun verifyData() : Boolean {
         val personName = person_name.text.toString().trim()
@@ -160,9 +157,19 @@ class EditActivity : AppCompatActivity(), FirestoreListener {
         if (verifyData) {
 
             CoroutineScope(Dispatchers.Main).launch {
-                var birthday = FSBirthday("123",personName,date, "asdf", isImportant.toString(), notes, "asdfasdf")
+                val birthday : FSBirthday = if (profilePicAdded)
+                 FSBirthday(docId,personName,date, event.toString(), isImportant.toString(), notes, profileuri.lastPathSegment.toString())
+                else
+                 FSBirthday(docId,personName,date, event.toString(), isImportant.toString(), notes, "")
+
                 FireStoreUtils().addBirthday(this@EditActivity, birthday, this@EditActivity)
             }
+        }
+    }
+
+    private fun uploadProfilePic() {
+        CoroutineScope(Dispatchers.Main).launch {
+            FirebaseCloudStorageUtils().uploadProfilePic(this@EditActivity, profileuri, this@EditActivity)
         }
     }
 
@@ -174,97 +181,14 @@ class EditActivity : AppCompatActivity(), FirestoreListener {
         val notes = notes.text.toString().trim()
         val profilePic = getProfilePic()
 
-        //checking if the attributes are empty
-        if (personName.isEmpty()) {
-            tvv1.error = getString(R.string.name_error_string)
-        } else if (date.isEmpty()) {
-            select_birthday_error.visibility = View.VISIBLE
-        }
 
-        if (personName.isNotEmpty() && date.isNotEmpty()) {
+        if (verifyData()) {
+            val birthday : FSBirthday = if (profilePicAdded)
+                FSBirthday("1234",personName, date, event.toString(), isImportant.toString(), notes, profileuri.lastPathSegment.toString())
+            else
+                FSBirthday("1234",personName, date, event.toString(), isImportant.toString(), notes, selected_birthday.profilePic)
 
-            if (profilePicAdded) {
-                Utils.flog("inside if")
-
-                if (!selected_birthday.equals("")) {
-
-                    val delref = storage.getReferenceFromUrl(selected_birthday.profilePic)
-                    delref.delete().addOnSuccessListener {
-                        Utils.flog("photo deleted")
-
-                        val ref =
-                            storage.reference.child("profilePic/" + uid + "/" + profileuri!!.lastPathSegment + ".jpg")
-                        ref.putFile(profileuri!!).addOnSuccessListener {
-
-                            Utils.flog("photo uploaded successfully")
-
-                            ref.downloadUrl.addOnCompleteListener {
-                                Utils.flog("Storage downloadedUrl : ${it.result}")
-
-                                // Create a new birthday in db
-                                val birthdayMap = hashMapOf(
-                                    "peron_name" to personName,
-                                    "date" to date,
-                                    "event" to event,
-                                    "isImportant" to isImportant,
-                                    "notes" to notes,
-                                    "profilePic" to it.result.toString()
-                                )
-
-                                // Add a new document with a generated ID
-                                db.collection("users/" + uid + "/Birthdays")
-                                    .document(selected_birthday.id)
-                                    .set(birthdayMap, SetOptions.merge())
-                                    .addOnSuccessListener { documentReference ->
-
-//                                        Utils.flog("DocumentSnapshot added with ID: ${documentReference.id}" )
-
-                                        startActivity(Intent(this, MainActivity::class.java))
-
-                                    }
-                                    .addOnFailureListener { e ->
-                                        Utils.flog("Error adding document -->" + e)
-                                    }
-                            }
-                        }
-
-                    }
-                }
-
-
-            } else {
-
-                // Create a new birthday in db
-                val birthdayMap = hashMapOf(
-                    "peron_name" to personName,
-                    "date" to date,
-                    "event" to event,
-                    "isImportant" to isImportant,
-                    "notes" to notes,
-                    "profilePic" to ""
-                )
-
-                // Add a new document with a generated ID
-                db.collection("users/" + uid + "/Birthdays").document(selected_birthday.id)
-                    .set(birthdayMap, SetOptions.merge())
-                    .addOnSuccessListener { documentReference ->
-
-//                        Utils.flog("DocumentSnapshot added with ID: ${documentReference.id}" )
-
-                        startActivity(Intent(this, MainActivity::class.java))
-
-                    }
-                    .addOnFailureListener { e ->
-                        Utils.flog("Error adding document -->" + e)
-                    }
-
-            }
-
-//            val data = hashMapOf("peron_name" to person_name,"date" to date, "isImportant" to isImportant, "notes" to notes)
-//            db.collection("users/" + uid + "/Birthdays").document(selected_birthday.id)
-//                .set(data, SetOptions.merge())
-//            startActivity(Intent(this, MainActivity::class.java))
-
+            FireStoreUtils().updateBirthday(this, "",birthday, this)
         }
     }
 
@@ -303,7 +227,7 @@ class EditActivity : AppCompatActivity(), FirestoreListener {
 //            }
 
 
-            startActivity(Intent(this, MainActivity::class.java))
+//            startActivity(Intent(this, MainActivity::class.java))
 
         }
     }
@@ -549,11 +473,26 @@ class EditActivity : AppCompatActivity(), FirestoreListener {
         return null
     }
 
-    override fun response(response: Any) {
-        if (response.equals(Enums.ADD_REQ_SUCCESS))
+    override fun fireStoreResponse(response: Any) {
+        //add birthday callback
+        if (response == Enums.ADD_REQ_SUCCESS)
             startActivity(Intent(this, MainActivity::class.java))
-        else if (response.equals(Enums.ADD_REQ_FAILED))
+        else if (response == Enums.ADD_REQ_FAILED)
             Toast.makeText(this, "Adding birthday failed", Toast.LENGTH_SHORT).show()
+
+        //update birthday callback
+        if (response == FSBirthday::class.java){
+            selected_birthday = response as FSBirthday
+            setDefaultData(selected_birthday)
+        }
+    }
+
+    override fun cloudResponse(response: Any) {
+        //upload profile pic callback
+        if (response == Enums.PROFILE_PIC_REQ_SUCCESS)
+            addBirthdayFireStore()
+        else if (response == Enums.PROFILE_PIC_REQ_FAILED)
+            Toast.makeText(this, "ProfilePic upload failed", Toast.LENGTH_SHORT).show()
     }
 
 }

@@ -2,22 +2,16 @@ package com.andromite.birthdayreminder.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.Utils.Enums
-import com.andromite.birthdayreminder.Utils.SP
-import com.andromite.birthdayreminder.Utils.Utils
+import com.andromite.birthdayreminder.utils.Enums
+import com.andromite.birthdayreminder.utils.SP
+import com.andromite.birthdayreminder.utils.Utils
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_social_login.*

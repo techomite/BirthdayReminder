@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
 import com.andromite.birthdayreminder.fragments.HomeFragment
+import com.andromite.birthdayreminder.utils.FirebaseCloudListener
+import com.andromite.birthdayreminder.utils.FirebaseCloudStorageUtils
+import com.andromite.birthdayreminder.utils.Utils
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.layout_home_recyclerview.view.*
 import java.io.Serializable
@@ -53,23 +56,20 @@ class FSHomeAdapter(val birthdays: List<FSBirthday>, val onRecyclerItemClickList
 //        holder.view.pp4.text = birthdays.get(position).notes
 //        holder.view.pp5.text = birthdays.get(position).event.toString()
 
-        if (!birthdays.get(position).profilePic.equals("")) {
-            Glide.with(holder.view)
-                .load(birthdays[position].profilePic)
-                .into(holder.view.profilePic)
-        } else {
-            holder.view.profilePic.setImageResource(R.drawable.ic_circle_avatar)
-        }
+
+
+        FirebaseCloudStorageUtils().downloadImage(birthdays[position].profilePic, object : FirebaseCloudListener{
+            override fun cloudResponse(response: Any) {
+                Glide.with(holder.view)
+                    .load(response)
+                    .error(R.drawable.ic_circle_avatar)
+                    .into(holder.view.profilePic)
+            }
+
+        })
 
         holder.view.cl_card_main.setOnClickListener {
-//            Log.e("12345 inside adapter", birthdays.get(position).id.toString())
-//            onImageClickListener?.onImageClick(birthdays.get(position).id
-//            intent.putExtra("id",birthdays.get(position).id)
-
             onRecyclerItemClickListener.onImageClick(position)
-
-
-
         }
 
     }

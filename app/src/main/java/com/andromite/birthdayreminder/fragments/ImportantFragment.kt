@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.andromite.birthdayreminder.FSBirthday
 import com.andromite.birthdayreminder.R
-import com.andromite.birthdayreminder.Utils.Enums
-import com.andromite.birthdayreminder.Utils.SP
-import com.andromite.birthdayreminder.Utils.Utils
+import com.andromite.birthdayreminder.utils.Enums
+import com.andromite.birthdayreminder.utils.SP
+import com.andromite.birthdayreminder.utils.Utils
 import com.andromite.birthdayreminder.activity.ViewBirthday
 import com.andromite.birthdayreminder.adapter.FsimpAdapter
 import com.google.firebase.firestore.ktx.firestore

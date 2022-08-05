@@ -1,4 +1,4 @@
-package com.andromite.birthdayreminder.Utils
+package com.andromite.birthdayreminder.utils
 
 import android.util.Log
 

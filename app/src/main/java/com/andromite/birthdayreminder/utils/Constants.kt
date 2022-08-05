@@ -1,4 +1,4 @@
-package com.andromite.birthdayreminder.Utils
+package com.andromite.birthdayreminder.utils
 
 class Constants {
     companion object {

@@ -1,4 +1,4 @@
-package com.andromite.birthdayreminder.Utils
+package com.andromite.birthdayreminder.utils
 
 import android.content.Context
 import com.andromite.birthdayreminder.FSBirthday
@@ -14,6 +14,7 @@ class FireStoreUtils {
 
     fun readAllBirthdays(context: Context, listener: FirestoreListener) {
         val userId = SP.get(context, Enums.UserId.name)
+        var birthdayList = mutableListOf<FSBirthday>()
 
         db.collection(Enums.Users.name).document(userId).collection(Enums.Birthdays.name)
             .get()
@@ -21,8 +22,9 @@ class FireStoreUtils {
                 for (document in result) {
                     Utils.flog("firestore response ${document.id} => ${document.data}")
 
-                    convertMapToObject(document.data)?.let { listener.response(it) }
+                    convertMapToObject(document.data)?.let { birthdayList.add(it) }
                 }
+                listener.fireStoreResponse(birthdayList)
             }
             .addOnFailureListener { exception ->
                 Utils.flog("Error getting documents. $exception")
@@ -40,7 +42,7 @@ class FireStoreUtils {
                 if (document != null) {
                     Utils.floge("DocumentSnapshot data: ${document.data}")
                     val birthday = convertMapToObject(document.data)
-                    birthday?.let { listener.response(it) }
+                    birthday?.let { listener.fireStoreResponse(it) }
                 } else {
                     Utils.floge("No such document")
                 }
@@ -69,11 +71,11 @@ class FireStoreUtils {
             .add(user)
             .addOnSuccessListener { documentReference ->
                 Utils.floge("DocumentSnapshot added with ID: ${documentReference.id}")
-                listener.response(Enums.ADD_REQ_SUCCESS)
+                listener.fireStoreResponse(Enums.ADD_REQ_SUCCESS)
             }
             .addOnFailureListener { e ->
                 Utils.floge("Error adding document $e")
-                listener.response(Enums.ADD_REQ_FAILED)
+                listener.fireStoreResponse(Enums.ADD_REQ_FAILED)
             }
     }
 
@@ -95,11 +97,11 @@ class FireStoreUtils {
             .update(user as Map<String, Any>)
             .addOnSuccessListener {
                 Utils.floge("DocumentSnapshot updated")
-                listener.response(Enums.UPDATE_REQ_SUCESS.name)
+                listener.fireStoreResponse(Enums.UPDATE_REQ_SUCCESS.name)
             }
             .addOnFailureListener { e ->
                 Utils.floge("Error updating document $e")
-                listener.response(Enums.UPDATE_REQ_FAILED.name)
+                listener.fireStoreResponse(Enums.UPDATE_REQ_FAILED.name)
             }
     }
 
