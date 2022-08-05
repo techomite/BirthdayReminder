@@ -31,7 +31,10 @@ enum class Enums {
 
     // user data
     UserId,
-    ProfilePic
+    ProfilePic,
+    DocId,
+
+    ADD_BIRTHDAY
 
 
 }

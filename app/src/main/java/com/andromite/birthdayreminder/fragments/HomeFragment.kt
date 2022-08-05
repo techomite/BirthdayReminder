@@ -37,20 +37,8 @@ import kotlin.collections.ArrayList
 
 class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
 
-    lateinit var home: HomeFragment
-    var imp: Boolean = false
     var event: Int = 1
-    var profileuri: Uri? = null
     lateinit var birthdayList: List<FSBirthday>
-    var FSbirthdayList: ArrayList<FSBirthday> = ArrayList()
-    var DocList: ArrayList<String> = ArrayList()
-    var docid : String = ""
-
-    private val GALLERY_REQUEST_CODE = 1234
-
-    val TAG = "12345"
-    var profilePicAdded: Boolean = false
-
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -61,11 +49,6 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        val db = Firebase.firestore
-        val storage = Firebase.storage
-
-
-        // get UID from sharedprefrences
         var uid = context?.let { SP.get(it, Enums.UserId.name) }
         Utils.flog(Enums.UserId.name + uid)
 
@@ -73,19 +56,18 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
         view.recyclerview.hasFixedSize()
         view.recyclerview.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        FireStoreUtils().readAllBirthdays(requireContext(),object : FirestoreListener{
+        FireStoreUtils().readAllBirthdays(requireContext(), object : FirestoreListener {
             override fun fireStoreResponse(response: Any) {
-                birthdayList  = response as List<FSBirthday>
+                birthdayList = response as List<FSBirthday>
                 view.recyclerview.adapter = FSHomeAdapter(birthdayList, this@HomeFragment)
             }
 
         })
 
-
         // FAB add Birthday Button
         view.floating_action_button.setOnClickListener {
-            var intent = Intent(context,EditActivity::class.java)
-            intent.putExtra("add_birthday",true);
+            var intent = Intent(context, EditActivity::class.java)
+            intent.putExtra(Enums.ADD_BIRTHDAY.name, true);
             startActivity(intent)
         }
 
@@ -93,9 +75,8 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
     }
 
     override fun onImageClick(imageData: Int) {
-
         val intent = Intent(requireContext(), ViewBirthday::class.java)
-        intent.putExtra("docId", birthdayList[imageData].id)
+        intent.putExtra(Enums.DocId.name, birthdayList[imageData].id)
         startActivity(intent)
 
     }

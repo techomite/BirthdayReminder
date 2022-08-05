@@ -28,13 +28,12 @@ class ViewBirthday : AppCompatActivity(), FirestoreListener {
         uid = SP.get(this,Enums.UserId.name)
         Utils.flog(uid)
 
-        intent.getStringExtra("docId")?.let { FireStoreUtils().viewBirthday(this, it, this) }
+        intent.getStringExtra(Enums.DocId.name)?.let { FireStoreUtils().viewBirthday(this, it, this) }
 
 
         edit_birthday.setOnClickListener {
-
             var intent = Intent(this,EditActivity::class.java)
-            intent.putExtra("docId", intent.getStringExtra("docId"))
+            intent.putExtra(Enums.DocId.name, intent.getStringExtra(Enums.DocId.name))
             startActivity(intent)
 
         }
