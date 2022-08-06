@@ -25,52 +25,39 @@ class ViewBirthday : AppCompatActivity(), FirestoreListener {
 
         val db = Firebase.firestore
         val storage = Firebase.storage
-        uid = SP.get(this,Enums.UserId.name)
+        uid = SP.get(this, Enums.UserId.name)
         Utils.flog(uid)
 
-        intent.getStringExtra(Enums.DocId.name)?.let { FireStoreUtils().viewBirthday(this, it, this) }
+        intent.getStringExtra(Enums.DocId.name)
+            ?.let { FireStoreUtils().viewBirthday(this, it, this) }
 
 
         edit_birthday.setOnClickListener {
-            var intent = Intent(this,EditActivity::class.java)
-            intent.putExtra(Enums.DocId.name, intent.getStringExtra(Enums.DocId.name))
+            var intent = Intent(this, EditActivity::class.java)
+            intent.putExtra(Enums.DocId.name, getIntent().getStringExtra(Enums.DocId.name))
+            intent.putExtra(Enums.UPDATE_BIRTHDAY.name, true)
             startActivity(intent)
 
         }
 
         //delete birthday
-//        delete_birthday.setOnClickListener {
-//
-//            db.collection("users/" + uid + "/Birthdays").document(FSselected_birthday.id)
-//                .delete()
-//                .addOnSuccessListener {
-//                    Utils.flog( "DocumentSnapshot successfully deleted!")
-//                    startActivity(Intent(this,MainActivity::class.java))
-//
-//                }
-//                .addOnFailureListener { e -> Utils.flog("Error deleting document $e") }
-//        }
+        delete_birthday.setOnClickListener {
 
-//        if (!FSselected_birthday?.profilePic.equals("")){
-//
-//            var delref = storage.getReferenceFromUrl(FSselected_birthday?.profilePic)
-//            delref.delete()
-//                .addOnSuccessListener { Utils.flog( "Photo successfully deleted!") }
-//                .addOnFailureListener { e -> Utils.flog("Error deleting photo $e") }
-//
-//        }
+            FSselected_birthday?.let { it1 -> FireStoreUtils().deleteBirthday(this, it1.id, this ) }
+            FSselected_birthday?.let { it1 -> FirebaseCloudStorageUtils().deleteImage(it1.profilePic) }
+    }
 
-//        profilePic.setOnClickListener {
-//
-//            if (!FSselected_birthday?.profilePic.equals("")) {
-//                var intent = Intent(this, ViewPhotoActivity::class.java)
-//                intent.putExtra("photourl",FSselected_birthday.profilePic)
-//                startActivity(intent)
-//            } else {
-//                Toast.makeText(this,"No Photo",Toast.LENGTH_SHORT).show()
-//            }
-//
-//        }
+        profilePic.setOnClickListener {
+
+            if (!FSselected_birthday?.profilePic.equals("")) {
+                var intent = Intent(this, ViewPhotoActivity::class.java)
+                intent.putExtra("photourl",FSselected_birthday?.profilePic)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this,"No Photo",Toast.LENGTH_SHORT).show()
+            }
+
+        }
 
     }
 
@@ -103,7 +90,7 @@ class ViewBirthday : AppCompatActivity(), FirestoreListener {
             FSselected_birthday?.profilePic?.let {
                 FirebaseCloudStorageUtils().downloadImage(it, object : FirebaseCloudListener {
                     override fun cloudResponse(response: Any) {
-                        Glide.with(this@ViewBirthday).load(it).into(profilePic)
+                        Glide.with(this@ViewBirthday).load(response).into(profilePic)
                     }
                 })
             }
@@ -111,7 +98,21 @@ class ViewBirthday : AppCompatActivity(), FirestoreListener {
     }
 
     override fun fireStoreResponse(response: Any) {
-        FSselected_birthday = response as FSBirthday
-        setValues()
+        if (response == Enums.DELETE_REQ_SUCCESS.name) {
+            startActivity(Intent(this, MainActivity::class.java))
+        } else if (response == Enums.DELETE_REQ_FAILED.name){
+            Toast.makeText(this, "Error deleting birthday", Toast.LENGTH_SHORT).show()
+
+        }
+    }
+
+    override fun viewResponse(name: String, birthday: FSBirthday?) {
+        if (name == Enums.VIEW_REQ_SUCCESS.name) {
+            FSselected_birthday = birthday
+            setValues()
+        } else if (name == Enums.VIEW_REQ_FAILED.name){
+            Toast.makeText(this, "Error getting data", Toast.LENGTH_SHORT).show()
+
+        }
     }
 }

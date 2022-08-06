@@ -55,5 +55,14 @@ class FirebaseCloudStorageUtils {
             }
         }
 
+    fun deleteImage(profilePic: String) {
+        if (profilePic != ""){
+            val delref = storage.getReferenceFromUrl(profilePic)
+            delref.delete()
+                .addOnSuccessListener { Utils.flog("Photo successfully deleted!") }
+                .addOnFailureListener { e -> Utils.flog("Error deleting photo $e") }
+        }
+    }
+
 
 }

@@ -9,7 +9,7 @@ enum class Enums {
     id,
     person_name,
     date,
-    events,
+    event,
     isImportant,
     notes,
     profilePic,
@@ -21,8 +21,12 @@ enum class Enums {
     VIEW_REQ_FAILED,
     ADD_REQ_SUCCESS,
     ADD_REQ_FAILED,
+    DELETE_REQ_SUCCESS,
+    DELETE_REQ_FAILED,
     PROFILE_PIC_REQ_SUCCESS,
     PROFILE_PIC_REQ_FAILED,
+    PROFILE_PIC_DELETE_SUCCESS,
+    PROFILE_PIC_DELETE_FAILED,
     CLOUD_REQ_SUCCESS,
     CLOUD_REQ_FAILED,
 
@@ -34,7 +38,8 @@ enum class Enums {
     ProfilePic,
     DocId,
 
-    ADD_BIRTHDAY
+    ADD_BIRTHDAY,
+    UPDATE_BIRTHDAY
 
 
 }

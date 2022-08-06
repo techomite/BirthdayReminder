@@ -62,6 +62,10 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
                 view.recyclerview.adapter = FSHomeAdapter(birthdayList, this@HomeFragment)
             }
 
+            override fun viewResponse(name: String, birthday: FSBirthday?) {
+
+            }
+
         })
 
         // FAB add Birthday Button
@@ -77,6 +81,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
     override fun onImageClick(imageData: Int) {
         val intent = Intent(requireContext(), ViewBirthday::class.java)
         intent.putExtra(Enums.DocId.name, birthdayList[imageData].id)
+        intent.putExtra(Enums.UPDATE_BIRTHDAY.name, true);
         startActivity(intent)
 
     }

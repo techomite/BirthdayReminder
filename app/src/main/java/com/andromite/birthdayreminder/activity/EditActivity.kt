@@ -20,7 +20,6 @@ import com.andromite.birthdayreminder.utils.Constants.Companion.GALLERY_REQUEST_
 import com.andromite.birthdayreminder.broadcast.ReminderBroadcast
 import com.andromite.birthdayreminder.fragments.HomeFragment
 import com.bumptech.glide.Glide
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -56,7 +55,7 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
 
     var event: Int = 1
     var imp: Boolean = false
-    lateinit var profileuri: Uri
+    var profileuri: Uri? = null
     lateinit var id: String
     lateinit var selected_birthday: FSBirthday
     lateinit var uid: String
@@ -75,20 +74,23 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
 
 
         if (intent.hasExtra(Enums.ADD_BIRTHDAY.name)) {
-            docId = System.currentTimeMillis().toString()
+            docId = FireStoreUtils().getUniqueDocId(this)
 
         } else {
             var docId = intent.getStringExtra(Enums.DocId.name)
             FireStoreUtils().viewBirthday(this, docId.toString(), this) // update selected birthday
-            setDefaultData(selected_birthday)
+//            setDefaultData(selected_birthday)
         }
 
         btn_submitt.setOnClickListener {
-            saveToDB()        // old Room DB code
-            if (intent.hasExtra("add_birthday")) {
+//            saveToDB()        // old Room DB code
+            if (intent.hasExtra(Enums.ADD_BIRTHDAY.name)) {
+                if (profilePicAdded)
                 uploadProfilePic()
+                else
+                    addBirthdayFireStore()
 //                setReminder()
-            } else if (intent.hasExtra("edit_birthday")) {
+            } else if (intent.hasExtra(Enums.UPDATE_BIRTHDAY.name)) {
                 updateFireStore()
             }
         }
@@ -144,7 +146,7 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
         val date = date.text.toString().trim()
         val isImportant = imp
         val notes = notes.text.toString().trim()
-        val profilePic = getProfilePic()
+//        val profilePic = getProfilePic()
 
         val verifyData = verifyData()
 
@@ -159,7 +161,7 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
                         event.toString(),
                         isImportant.toString(),
                         notes,
-                        profileuri.lastPathSegment.toString()
+                        profileuri?.lastPathSegment.toString()
                     )
                 else
                     FSBirthday(
@@ -179,11 +181,13 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
 
     private fun uploadProfilePic() {
         CoroutineScope(Dispatchers.Main).launch {
-            FirebaseCloudStorageUtils().uploadProfilePic(
-                this@EditActivity,
-                profileuri,
-                this@EditActivity
-            )
+            profileuri?.let {
+                FirebaseCloudStorageUtils().uploadProfilePic(
+                    this@EditActivity,
+                    it,
+                    this@EditActivity
+                )
+            }
         }
     }
 
@@ -199,17 +203,17 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
         if (verifyData()) {
             val birthday: FSBirthday = if (profilePicAdded)
                 FSBirthday(
-                    "1234",
+                    selected_birthday.id,
                     personName,
                     date,
                     event.toString(),
                     isImportant.toString(),
                     notes,
-                    profileuri.lastPathSegment.toString()
+                    profileuri?.lastPathSegment.toString()
                 )
             else
                 FSBirthday(
-                    "1234",
+                    selected_birthday.id,
                     personName,
                     date,
                     event.toString(),
@@ -510,10 +514,22 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
         else if (response == Enums.ADD_REQ_FAILED)
             Toast.makeText(this, "Adding birthday failed", Toast.LENGTH_SHORT).show()
 
-        //update birthday callback
-        if (response == FSBirthday::class.java) {
-            selected_birthday = response as FSBirthday
+        if (response == Enums.UPDATE_REQ_SUCCESS.name)
+            startActivity(Intent(this, MainActivity::class.java))
+        else if (response == Enums.UPDATE_REQ_FAILED.name)
+            Toast.makeText(this, "Updating birthday failed", Toast.LENGTH_SHORT).show()
+
+    }
+
+    override fun viewResponse(name: String, birthday: FSBirthday?) {
+        if (name == Enums.VIEW_REQ_SUCCESS.name) {
+            if (birthday != null) {
+                selected_birthday = birthday
+            }
             setDefaultData(selected_birthday)
+        } else if (name == Enums.VIEW_REQ_FAILED.name){
+            Toast.makeText(this, "Error getting data", Toast.LENGTH_SHORT).show()
+
         }
     }
 
