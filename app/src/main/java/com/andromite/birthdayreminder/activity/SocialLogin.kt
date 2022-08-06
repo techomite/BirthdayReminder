@@ -30,8 +30,6 @@ class SocialLogin : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_social_login)
 
-        startActivity(Intent(this, MainActivity::class.java))
-
         //region SignIn Process
         googleLogin.setOnClickListener {
 
@@ -62,10 +60,11 @@ class SocialLogin : AppCompatActivity() {
                 "email" to user.email
             )
 
-//            db.collection(Enums.Users.name).document(userUID).set(userIdentity)
+            db.collection(Enums.Users.name).document(userUID).set(userIdentity)
 
             SP.save(this, Enums.UserId.name, userUID)
             startActivity(Intent(this, MainActivity::class.java))
+            finish()
             // ...
         } else {
             // Sign in failed. If response is null the user canceled the

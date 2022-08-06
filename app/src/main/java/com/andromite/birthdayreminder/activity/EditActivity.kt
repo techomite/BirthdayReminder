@@ -509,13 +509,21 @@ class EditActivity : AppCompatActivity(), FirestoreListener, FirebaseCloudListen
 
     override fun fireStoreResponse(response: Any) {
         //add birthday callback
-        if (response == Enums.ADD_REQ_SUCCESS)
-            startActivity(Intent(this, MainActivity::class.java))
+        if (response == Enums.ADD_REQ_SUCCESS) {
+            var intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
+            finish()
+        }
         else if (response == Enums.ADD_REQ_FAILED)
             Toast.makeText(this, "Adding birthday failed", Toast.LENGTH_SHORT).show()
 
-        if (response == Enums.UPDATE_REQ_SUCCESS.name)
-            startActivity(Intent(this, MainActivity::class.java))
+        if (response == Enums.UPDATE_REQ_SUCCESS.name) {
+            var intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
+            finish()
+        }
         else if (response == Enums.UPDATE_REQ_FAILED.name)
             Toast.makeText(this, "Updating birthday failed", Toast.LENGTH_SHORT).show()
 

@@ -81,7 +81,7 @@ class HomeFragment : BaseFragment(), HomeAdapter.OnRecyclerItemClickListener {
     override fun onImageClick(imageData: Int) {
         val intent = Intent(requireContext(), ViewBirthday::class.java)
         intent.putExtra(Enums.DocId.name, birthdayList[imageData].id)
-        intent.putExtra(Enums.UPDATE_BIRTHDAY.name, true);
+        intent.putExtra(Enums.ADD_BIRTHDAY.name, true);
         startActivity(intent)
 
     }

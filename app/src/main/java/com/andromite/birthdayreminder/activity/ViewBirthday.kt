@@ -23,8 +23,6 @@ class ViewBirthday : AppCompatActivity(), FirestoreListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_birthday)
 
-        val db = Firebase.firestore
-        val storage = Firebase.storage
         uid = SP.get(this, Enums.UserId.name)
         Utils.flog(uid)
 

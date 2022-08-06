@@ -31,8 +31,10 @@ class SplashScreen : AppCompatActivity() {
         if (currentUser != null) {
             Log.e("12345 current UID", currentUser.uid)
             startActivity(Intent(this, MainActivity::class.java))
+            finish()
         } else {
             startActivity(Intent(this, SocialLogin::class.java))
+            finish()
         }
     }
 
